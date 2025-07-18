@@ -497,7 +497,7 @@ async def get_booking(booking_id: str, current_user: User = Depends(get_current_
 @api_router.put("/bookings/{booking_id}/status")
 async def update_booking_status(
     booking_id: str, 
-    status: BookingStatus, 
+    status_data: dict,
     current_user: User = Depends(get_current_user)
 ):
     booking = await db.bookings.find_one({"id": booking_id})
