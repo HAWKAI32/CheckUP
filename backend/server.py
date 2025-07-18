@@ -510,6 +510,10 @@ async def update_booking_status(
         if not clinic or booking["clinic_id"] != clinic["id"]:
             raise HTTPException(status_code=403, detail="Access denied")
     
+    status = status_data.get("status")
+    if not status:
+        raise HTTPException(status_code=400, detail="Status is required")
+    
     result = await db.bookings.update_one(
         {"id": booking_id}, 
         {"$set": {"status": status, "updated_at": datetime.utcnow()}}
