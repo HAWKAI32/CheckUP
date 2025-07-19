@@ -2992,6 +2992,7 @@ const ClinicDashboard = () => {
   const [myClinic, setMyClinic] = useState(null);
   const [testPricing, setTestPricing] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (user?.role === 'clinic') {
