@@ -314,24 +314,24 @@ const Home = () => {
       <div className="container mx-auto px-4 py-6 sm:py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
           {/* Browse by Tests */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-2xl font-bold mb-4 flex items-center">
-              <TestTube className="mr-2 h-6 w-6" />
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+            <h2 className="text-xl sm:text-2xl font-bold mb-4 flex items-center">
+              <TestTube className="mr-2 h-5 w-5 sm:h-6 sm:w-6" />
               Browse Lab Tests
             </h2>
-            <div className="grid grid-cols-2 gap-4 max-h-96 overflow-y-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 max-h-80 sm:max-h-96 overflow-y-auto">
               {filteredTests.map(test => (
                 <div 
                   key={test.id}
-                  className="border rounded-lg p-4 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors"
+                  className="border rounded-lg p-3 sm:p-4 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors"
                   onClick={() => handleTestSelect(test)}
                 >
                   <div className="flex items-center mb-2">
-                    <Activity className="h-8 w-8 text-blue-600 mr-2" />
-                    <h3 className="font-semibold">{test.name}</h3>
+                    <Activity className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 mr-2 flex-shrink-0" />
+                    <h3 className="font-semibold text-sm sm:text-base">{test.name}</h3>
                   </div>
-                  <p className="text-sm text-gray-600">{test.description}</p>
-                  <span className="inline-block mt-2 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                  <p className="text-xs sm:text-sm text-gray-600 mb-2 line-clamp-2">{test.description}</p>
+                  <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
                     {test.category}
                   </span>
                 </div>
@@ -340,34 +340,36 @@ const Home = () => {
           </div>
 
           {/* Browse by Clinics */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-2xl font-bold mb-4 flex items-center">
-              <Building className="mr-2 h-6 w-6" />
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+            <h2 className="text-xl sm:text-2xl font-bold mb-4 flex items-center">
+              <Building className="mr-2 h-5 w-5 sm:h-6 sm:w-6" />
               Browse Clinics & Hospitals
             </h2>
-            <div className="space-y-4 max-h-96 overflow-y-auto">
+            <div className="space-y-3 sm:space-y-4 max-h-80 sm:max-h-96 overflow-y-auto">
               {filteredClinics.map(clinic => (
                 <div 
                   key={clinic.id}
-                  className="border rounded-lg p-4 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors"
+                  className="border rounded-lg p-3 sm:p-4 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors"
                   onClick={() => handleClinicSelect(clinic)}
                 >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="font-semibold text-lg">{clinic.name}</h3>
-                      <p className="text-sm text-gray-600 mb-2">{clinic.description}</p>
-                      <div className="flex items-center text-sm text-gray-500">
-                        <MapPin className="h-4 w-4 mr-1" />
-                        {clinic.location}
-                      </div>
-                      <div className="flex items-center text-sm text-gray-500">
-                        <Phone className="h-4 w-4 mr-1" />
-                        {clinic.phone}
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between space-y-2 sm:space-y-0">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-base sm:text-lg">{clinic.name}</h3>
+                      <p className="text-xs sm:text-sm text-gray-600 mb-2 line-clamp-2">{clinic.description}</p>
+                      <div className="flex flex-col sm:flex-row sm:items-center text-xs sm:text-sm text-gray-500 space-y-1 sm:space-y-0 sm:space-x-4">
+                        <div className="flex items-center">
+                          <MapPin className="h-3 w-3 sm:h-4 sm:w-4 mr-1 flex-shrink-0" />
+                          <span className="truncate">{clinic.location}</span>
+                        </div>
+                        <div className="flex items-center">
+                          <Phone className="h-3 w-3 sm:h-4 sm:w-4 mr-1 flex-shrink-0" />
+                          <span>{clinic.phone}</span>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-center">
-                      <Star className="h-4 w-4 text-yellow-400 mr-1" />
-                      <span className="text-sm">{clinic.rating || 0} ({clinic.total_reviews || 0})</span>
+                    <div className="flex items-center justify-end sm:justify-start sm:ml-4">
+                      <Star className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-400 mr-1" />
+                      <span className="text-xs sm:text-sm">{clinic.rating || 0} ({clinic.total_reviews || 0})</span>
                     </div>
                   </div>
                 </div>
