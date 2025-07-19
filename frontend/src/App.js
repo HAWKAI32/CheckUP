@@ -2461,6 +2461,9 @@ const ClinicDashboard = () => {
         <div className="flex-1 p-8">
           {activeTab === 'dashboard' && renderDashboard()}
           {activeTab === 'bookings' && renderBookings()}
+          {activeTab === 'tests' && renderOfferedTests()}
+          {activeTab === 'checklist' && renderSampleChecklist()}
+          {activeTab === 'commissions' && renderCommissions()}
           {activeTab === 'profile' && renderProfile()}
         </div>
       </div>
