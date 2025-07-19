@@ -1142,10 +1142,10 @@ const AdminDashboard = () => {
 
   const renderBookings = () => (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Test Booking Management</h2>
-        <div className="flex items-center space-x-4">
-          <select className="border rounded px-3 py-2">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+        <h2 className="text-xl sm:text-2xl font-bold">Test Booking Management</h2>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+          <select className="border rounded px-3 py-2 text-sm">
             <option value="">All Status</option>
             <option value="new">New</option>
             <option value="scheduled">Scheduled</option>
@@ -1155,7 +1155,7 @@ const AdminDashboard = () => {
           <input 
             type="text" 
             placeholder="Search bookings..." 
-            className="border rounded px-3 py-2"
+            className="border rounded px-3 py-2 text-sm"
           />
         </div>
       </div>
