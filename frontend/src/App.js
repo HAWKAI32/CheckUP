@@ -1522,7 +1522,266 @@ const PricingForm = ({ tests, clinics, onSuccess }) => {
   );
 };
 
-const ClinicForm = ({ onSuccess }) => {
+const SurgeryInquiryModal = ({ inquiry, onUpdate }) => {
+  const [show, setShow] = useState(false);
+  const [formData, setFormData] = useState({
+    hospital_details: inquiry.hospital_details || '',
+    accommodation_details: inquiry.accommodation_details || '',
+    estimated_cost: inquiry.estimated_cost || '',
+    status: inquiry.status || 'pending'
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.put(`${API}/surgery-inquiries/${inquiry.id}`, formData);
+      setShow(false);
+      onUpdate();
+      alert('Surgery inquiry updated successfully!');
+    } catch (error) {
+      console.error('Error updating inquiry:', error);
+      alert('Error updating inquiry');
+    }
+  };
+
+  if (!show) {
+    return (
+      <button
+        onClick={() => setShow(true)}
+        className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
+      >
+        Manage
+      </button>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-96 overflow-y-auto">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold">Manage Surgery Inquiry</h2>
+          <button onClick={() => setShow(false)} className="text-gray-500">
+            <XCircle className="h-6 w-6" />
+          </button>
+        </div>
+        
+        <div className="mb-4 p-4 bg-gray-50 rounded">
+          <h3 className="font-semibold mb-2">Patient Information</h3>
+          <p><strong>Name:</strong> {inquiry.patient_name}</p>
+          <p><strong>Phone:</strong> {inquiry.patient_phone}</p>
+          <p><strong>Surgery:</strong> {inquiry.surgery_type}</p>
+          <p><strong>Condition:</strong> {inquiry.medical_condition}</p>
+          <p><strong>Budget:</strong> {inquiry.budget_range}</p>
+        </div>
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Hospital Details</label>
+            <textarea
+              className="w-full border rounded px-3 py-2 h-20"
+              placeholder="Enter hospital recommendations and details..."
+              value={formData.hospital_details}
+              onChange={(e) => setFormData({...formData, hospital_details: e.target.value})}
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Accommodation Details</label>
+            <textarea
+              className="w-full border rounded px-3 py-2 h-20"
+              placeholder="Enter accommodation options and details..."
+              value={formData.accommodation_details}
+              onChange={(e) => setFormData({...formData, accommodation_details: e.target.value})}
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Estimated Cost</label>
+            <input
+              type="text"
+              className="w-full border rounded px-3 py-2"
+              placeholder="e.g., $15,000 - $25,000"
+              value={formData.estimated_cost}
+              onChange={(e) => setFormData({...formData, estimated_cost: e.target.value})}
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <select
+              className="w-full border rounded px-3 py-2"
+              value={formData.status}
+              onChange={(e) => setFormData({...formData, status: e.target.value})}
+            >
+              <option value="pending">Pending</option>
+              <option value="in_progress">In Progress</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          
+          <div className="flex space-x-4">
+            <button
+              type="button"
+              onClick={() => setShow(false)}
+              className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+            >
+              Update Inquiry
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+const PricingForm = ({ tests, clinics, onSuccess }) => {
+  const [show, setShow] = useState(false);
+  const [formData, setFormData] = useState({
+    test_id: '',
+    clinic_id: '',
+    price_usd: '',
+    price_lrd: '',
+    is_available: true
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(`${API}/test-pricing`, {
+        ...formData,
+        price_usd: parseFloat(formData.price_usd),
+        price_lrd: parseFloat(formData.price_lrd)
+      });
+      setShow(false);
+      setFormData({
+        test_id: '',
+        clinic_id: '',
+        price_usd: '',
+        price_lrd: '',
+        is_available: true
+      });
+      onSuccess();
+      alert('Test pricing added successfully!');
+    } catch (error) {
+      console.error('Error adding pricing:', error);
+      alert('Error adding pricing');
+    }
+  };
+
+  if (!show) {
+    return (
+      <button
+        onClick={() => setShow(true)}
+        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center"
+      >
+        <Plus className="mr-2 h-4 w-4" />
+        Set Test Price
+      </button>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold">Set Test Pricing</h2>
+          <button onClick={() => setShow(false)} className="text-gray-500">
+            <XCircle className="h-6 w-6" />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Test</label>
+            <select
+              required
+              className="w-full border rounded px-3 py-2"
+              value={formData.test_id}
+              onChange={(e) => setFormData({...formData, test_id: e.target.value})}
+            >
+              <option value="">Select Test</option>
+              {tests.map(test => (
+                <option key={test.id} value={test.id}>{test.name}</option>
+              ))}
+            </select>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Clinic</label>
+            <select
+              required
+              className="w-full border rounded px-3 py-2"
+              value={formData.clinic_id}
+              onChange={(e) => setFormData({...formData, clinic_id: e.target.value})}
+            >
+              <option value="">Select Clinic</option>
+              {clinics.map(clinic => (
+                <option key={clinic.id} value={clinic.id}>{clinic.name}</option>
+              ))}
+            </select>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">USD Price</label>
+            <input
+              type="number"
+              step="0.01"
+              required
+              className="w-full border rounded px-3 py-2"
+              value={formData.price_usd}
+              onChange={(e) => setFormData({...formData, price_usd: e.target.value})}
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">LRD Price</label>
+            <input
+              type="number"
+              step="0.01"
+              required
+              className="w-full border rounded px-3 py-2"
+              value={formData.price_lrd}
+              onChange={(e) => setFormData({...formData, price_lrd: e.target.value})}
+            />
+          </div>
+          
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="available"
+              checked={formData.is_available}
+              onChange={(e) => setFormData({...formData, is_available: e.target.checked})}
+              className="mr-2"
+            />
+            <label htmlFor="available" className="text-sm text-gray-700">Available for booking</label>
+          </div>
+          
+          <div className="flex space-x-4">
+            <button
+              type="button"
+              onClick={() => setShow(false)}
+              className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+            >
+              Set Pricing
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
   const [show, setShow] = useState(false);
   const [users, setUsers] = useState([]);
   const [formData, setFormData] = useState({
