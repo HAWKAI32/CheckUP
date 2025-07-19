@@ -22,6 +22,7 @@ class ChekUpTester:
         self.session = requests.Session()
         self.session.timeout = TIMEOUT
         self.admin_token = None
+        self.sub_admin_token = None
         self.clinic_token = None
         self.test_data = {}
         self.results = {
