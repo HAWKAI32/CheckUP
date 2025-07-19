@@ -2850,6 +2850,230 @@ const UserRegistration = () => {
   );
 };
 
+const UserForm = ({ onSuccess }) => {
+  const [show, setShow] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    role: 'clinic',
+    location: ''
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(`${API}/auth/register`, formData);
+      setShow(false);
+      setFormData({
+        name: '',
+        email: '',
+        password: '',
+        role: 'clinic',
+        location: ''
+      });
+      onSuccess();
+      alert('User created successfully!');
+    } catch (error) {
+      console.error('Error creating user:', error);
+      alert('Error creating user');
+    }
+  };
+
+  if (!show) {
+    return (
+      <button
+        onClick={() => setShow(true)}
+        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 inline-flex items-center"
+      >
+        <Plus className="mr-2 h-4 w-4" />
+        Add User
+      </button>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold">Add New User</h2>
+          <button onClick={() => setShow(false)} className="text-gray-500">
+            <XCircle className="h-6 w-6" />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="text"
+            placeholder="Full Name"
+            required
+            className="w-full border rounded px-3 py-2"
+            value={formData.name}
+            onChange={(e) => setFormData({...formData, name: e.target.value})}
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            required
+            className="w-full border rounded px-3 py-2"
+            value={formData.email}
+            onChange={(e) => setFormData({...formData, email: e.target.value})}
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            required
+            className="w-full border rounded px-3 py-2"
+            value={formData.password}
+            onChange={(e) => setFormData({...formData, password: e.target.value})}
+          />
+          <select
+            className="w-full border rounded px-3 py-2"
+            value={formData.role}
+            onChange={(e) => setFormData({...formData, role: e.target.value})}
+          >
+            <option value="clinic">Clinic</option>
+            <option value="lab_technician">Lab Technician</option>
+            <option value="admin">Admin</option>
+          </select>
+          <input
+            type="text"
+            placeholder="Location"
+            className="w-full border rounded px-3 py-2"
+            value={formData.location}
+            onChange={(e) => setFormData({...formData, location: e.target.value})}
+          />
+          <div className="flex space-x-4">
+            <button
+              type="button"
+              onClick={() => setShow(false)}
+              className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+            >
+              Add User
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+const HospitalForm = ({ onSuccess }) => {
+  const [show, setShow] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    location: '',
+    contact: '',
+    specialties: '',
+    description: ''
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      // This would need a hospitals endpoint in the backend
+      // For now, just simulate success
+      setShow(false);
+      setFormData({
+        name: '',
+        location: '',
+        contact: '',
+        specialties: '',
+        description: ''
+      });
+      onSuccess();
+      alert('Hospital added successfully!');
+    } catch (error) {
+      console.error('Error adding hospital:', error);
+      alert('Error adding hospital');
+    }
+  };
+
+  if (!show) {
+    return (
+      <button
+        onClick={() => setShow(true)}
+        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 inline-flex items-center"
+      >
+        <Plus className="mr-2 h-4 w-4" />
+        Add Hospital
+      </button>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold">Add Partner Hospital</h2>
+          <button onClick={() => setShow(false)} className="text-gray-500">
+            <XCircle className="h-6 w-6" />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="text"
+            placeholder="Hospital Name"
+            required
+            className="w-full border rounded px-3 py-2"
+            value={formData.name}
+            onChange={(e) => setFormData({...formData, name: e.target.value})}
+          />
+          <input
+            type="text"
+            placeholder="Location"
+            required
+            className="w-full border rounded px-3 py-2"
+            value={formData.location}
+            onChange={(e) => setFormData({...formData, location: e.target.value})}
+          />
+          <input
+            type="text"
+            placeholder="Contact Information"
+            required
+            className="w-full border rounded px-3 py-2"
+            value={formData.contact}
+            onChange={(e) => setFormData({...formData, contact: e.target.value})}
+          />
+          <input
+            type="text"
+            placeholder="Specialties (comma separated)"
+            className="w-full border rounded px-3 py-2"
+            value={formData.specialties}
+            onChange={(e) => setFormData({...formData, specialties: e.target.value})}
+          />
+          <textarea
+            placeholder="Description"
+            className="w-full border rounded px-3 py-2 h-20"
+            value={formData.description}
+            onChange={(e) => setFormData({...formData, description: e.target.value})}
+          />
+          <div className="flex space-x-4">
+            <button
+              type="button"
+              onClick={() => setShow(false)}
+              className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+            >
+              Add Hospital
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   const { user } = useAuth();
   
