@@ -433,22 +433,22 @@ const Home = () => {
 
         {/* Shopping Cart */}
         {selectedTests.length > 0 && (
-          <div className="mt-8 bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-2xl font-bold mb-4">Selected Tests</h2>
-            <div className="space-y-4">
+          <div className="mt-6 sm:mt-8 bg-white rounded-lg shadow-md p-4 sm:p-6">
+            <h2 className="text-xl sm:text-2xl font-bold mb-4">Selected Tests</h2>
+            <div className="space-y-3 sm:space-y-4">
               {selectedTests.map(test => (
                 <div key={test.id} className="flex items-center justify-between border-b pb-2">
-                  <div>
-                    <h3 className="font-semibold">{test.name}</h3>
+                  <div className="flex-1 min-w-0 pr-4">
+                    <h3 className="font-semibold text-sm sm:text-base truncate">{test.name}</h3>
                     {selectedClinic && (
-                      <p className="text-sm text-gray-600">at {selectedClinic.name}</p>
+                      <p className="text-xs sm:text-sm text-gray-600 truncate">at {selectedClinic.name}</p>
                     )}
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 flex-shrink-0">
                     {selectedClinic && testPricing.find(tp => 
                       tp.test.id === test.id && tp.clinic.id === selectedClinic.id
                     ) && (
-                      <span className="font-bold">
+                      <span className="font-bold text-sm">
                         {currency === 'USD' ? '$' : 'L$'}{
                           currency === 'USD' 
                             ? testPricing.find(tp => tp.test.id === test.id && tp.clinic.id === selectedClinic.id).pricing.price_usd
@@ -458,19 +458,19 @@ const Home = () => {
                     )}
                     <button
                       onClick={() => removeTestFromCart(test.id)}
-                      className="text-red-600 hover:text-red-800"
+                      className="text-red-600 hover:text-red-800 p-1"
                     >
-                      <XCircle className="h-5 w-5" />
+                      <XCircle className="h-4 w-4 sm:h-5 sm:w-5" />
                     </button>
                   </div>
                 </div>
               ))}
               
-              <div className="flex items-center justify-between pt-4 border-t">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-4 border-t space-y-3 sm:space-y-0">
                 <div>
-                  <p className="text-lg"><strong>Total Tests: {selectedTests.length}</strong></p>
+                  <p className="text-base sm:text-lg"><strong>Total Tests: {selectedTests.length}</strong></p>
                   {selectedClinic && (
-                    <p className="text-xl font-bold text-blue-600">
+                    <p className="text-lg sm:text-xl font-bold text-blue-600">
                       Total: {currency === 'USD' ? '$' : 'L$'}{calculateTotal()}
                     </p>
                   )}
@@ -478,7 +478,7 @@ const Home = () => {
                 <button
                   onClick={() => setShowBookingForm(true)}
                   disabled={!selectedClinic}
-                  className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 disabled:bg-gray-400"
+                  className="w-full sm:w-auto bg-green-600 text-white px-4 sm:px-6 py-3 rounded-lg hover:bg-green-700 disabled:bg-gray-400 text-sm sm:text-base"
                 >
                   Book Tests
                 </button>
