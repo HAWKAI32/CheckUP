@@ -1035,16 +1035,570 @@ const AdminDashboard = () => {
           </nav>
         </div>
 
+  const renderBookings = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold">Booking Management</h2>
+      
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Booking ID</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Patient</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Clinic</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tests</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {bookings.map(booking => {
+              const clinic = clinics.find(c => c.id === booking.clinic_id);
+              return (
+                <tr key={booking.id}>
+                  <td className="px-6 py-4 whitespace-nowrap font-medium">{booking.booking_number}</td>
+                  <td className="px-6 py-4">
+                    <div>
+                      <p className="font-medium">{booking.patient_name}</p>
+                      <p className="text-sm text-gray-500">{booking.patient_phone}</p>
+                      <p className="text-sm text-gray-500">{booking.patient_location}</p>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <p className="font-medium">{clinic?.name || 'Unknown'}</p>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                      {booking.test_ids.length} test(s)
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className={`inline-block px-2 py-1 rounded text-xs ${
+                      booking.status === 'completed' ? 'bg-green-100 text-green-800' :
+                      booking.status === 'confirmed' ? 'bg-blue-100 text-blue-800' :
+                      booking.status === 'results_ready' ? 'bg-purple-100 text-purple-800' :
+                      'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {booking.status.replace('_', ' ')}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {booking.preferred_currency === 'USD' ? '$' : 'L$'}{booking.total_amount.toFixed(2)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <select
+                      value={booking.status}
+                      onChange={async (e) => {
+                        try {
+                          await axios.put(`${API}/bookings/${booking.id}/status`, { status: e.target.value });
+                          fetchBookings();
+                          alert('Booking status updated!');
+                        } catch (error) {
+                          console.error('Error updating status:', error);
+                          alert('Error updating status');
+                        }
+                      }}
+                      className="text-sm border rounded px-2 py-1"
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="confirmed">Confirmed</option>
+                      <option value="sample_collected">Sample Collected</option>
+                      <option value="results_ready">Results Ready</option>
+                      <option value="completed">Completed</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        
+        {bookings.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-gray-500">No bookings found.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  const renderSurgeryInquiries = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold">Surgery Inquiries Management</h2>
+      
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Inquiry ID</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Patient</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Surgery Type</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Budget</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {surgeryInquiries.map(inquiry => (
+              <tr key={inquiry.id}>
+                <td className="px-6 py-4 whitespace-nowrap font-medium">{inquiry.inquiry_number}</td>
+                <td className="px-6 py-4">
+                  <div>
+                    <p className="font-medium">{inquiry.patient_name}</p>
+                    <p className="text-sm text-gray-500">{inquiry.patient_phone}</p>
+                    <p className="text-sm text-gray-500">{inquiry.patient_email}</p>
+                  </div>
+                </td>
+                <td className="px-6 py-4">
+                  <div>
+                    <p className="font-medium">{inquiry.surgery_type}</p>
+                    <p className="text-sm text-gray-500">{inquiry.medical_condition.substring(0, 50)}...</p>
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
+                    {inquiry.budget_range}
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className={`inline-block px-2 py-1 rounded text-xs ${
+                    inquiry.status === 'completed' ? 'bg-green-100 text-green-800' :
+                    inquiry.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
+                    'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {inquiry.status}
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <SurgeryInquiryModal inquiry={inquiry} onUpdate={fetchSurgeryInquiries} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        
+        {surgeryInquiries.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-gray-500">No surgery inquiries found.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  const renderPricing = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold">Test Pricing Management</h2>
+        <PricingForm tests={tests} clinics={clinics} onSuccess={() => window.location.reload()} />
+      </div>
+      
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Test Name</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Clinic</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">USD Price</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">LRD Price</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Available</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {tests.map(test => {
+              return clinics.map(clinic => {
+                return (
+                  <tr key={`${test.id}-${clinic.id}`}>
+                    <td className="px-6 py-4 whitespace-nowrap font-medium">{test.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{clinic.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">$0.00</td>
+                    <td className="px-6 py-4 whitespace-nowrap">L$0.00</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded">
+                        Not Set
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <button className="text-blue-600 hover:text-blue-800 text-sm">
+                        Set Price
+                      </button>
+                    </td>
+                  </tr>
+                );
+              });
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <div className="flex">
+        {/* Sidebar */}
+        <div className="w-64 bg-white shadow-lg">
+          <div className="p-6">
+            <h1 className="text-xl font-bold text-gray-800">Admin Panel</h1>
+          </div>
+          <nav className="mt-6">
+            <div className="px-6 py-2">
+              <button
+                onClick={() => setActiveTab('dashboard')}
+                className={`flex items-center w-full px-2 py-2 text-sm rounded ${
+                  activeTab === 'dashboard' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <BarChart3 className="mr-3 h-4 w-4" />
+                Dashboard
+              </button>
+            </div>
+            <div className="px-6 py-2">
+              <button
+                onClick={() => setActiveTab('tests')}
+                className={`flex items-center w-full px-2 py-2 text-sm rounded ${
+                  activeTab === 'tests' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <TestTube className="mr-3 h-4 w-4" />
+                Lab Tests
+              </button>
+            </div>
+            <div className="px-6 py-2">
+              <button
+                onClick={() => setActiveTab('clinics')}
+                className={`flex items-center w-full px-2 py-2 text-sm rounded ${
+                  activeTab === 'clinics' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <Building className="mr-3 h-4 w-4" />
+                Clinics
+              </button>
+            </div>
+            <div className="px-6 py-2">
+              <button
+                onClick={() => setActiveTab('pricing')}
+                className={`flex items-center w-full px-2 py-2 text-sm rounded ${
+                  activeTab === 'pricing' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <DollarSign className="mr-3 h-4 w-4" />
+                Test Pricing
+              </button>
+            </div>
+            <div className="px-6 py-2">
+              <button
+                onClick={() => setActiveTab('bookings')}
+                className={`flex items-center w-full px-2 py-2 text-sm rounded ${
+                  activeTab === 'bookings' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <Calendar className="mr-3 h-4 w-4" />
+                Bookings
+              </button>
+            </div>
+            <div className="px-6 py-2">
+              <button
+                onClick={() => setActiveTab('surgery')}
+                className={`flex items-center w-full px-2 py-2 text-sm rounded ${
+                  activeTab === 'surgery' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <Heart className="mr-3 h-4 w-4" />
+                Surgery Inquiries
+              </button>
+            </div>
+            <div className="px-6 py-2">
+              <button
+                onClick={() => setActiveTab('users')}
+                className={`flex items-center w-full px-2 py-2 text-sm rounded ${
+                  activeTab === 'users' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <Users className="mr-3 h-4 w-4" />
+                User Management
+              </button>
+            </div>
+          </nav>
+        </div>
+
         {/* Main Content */}
         <div className="flex-1 p-8">
           {activeTab === 'dashboard' && renderDashboard()}
           {activeTab === 'tests' && renderTests()}
           {activeTab === 'clinics' && renderClinics()}
-          {/* Add other tab renders here */}
+          {activeTab === 'pricing' && renderPricing()}
+          {activeTab === 'bookings' && renderBookings()}
+          {activeTab === 'surgery' && renderSurgeryInquiries()}
         </div>
       </div>
     </div>
   );
+};
+
+const SurgeryInquiryModal = ({ inquiry, onUpdate }) => {
+  const [show, setShow] = useState(false);
+  const [formData, setFormData] = useState({
+    hospital_details: inquiry.hospital_details || '',
+    accommodation_details: inquiry.accommodation_details || '',
+    estimated_cost: inquiry.estimated_cost || '',
+    status: inquiry.status || 'pending'
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.put(`${API}/surgery-inquiries/${inquiry.id}`, formData);
+      setShow(false);
+      onUpdate();
+      alert('Surgery inquiry updated successfully!');
+    } catch (error) {
+      console.error('Error updating inquiry:', error);
+      alert('Error updating inquiry');
+    }
+  };
+
+  if (!show) {
+    return (
+      <button
+        onClick={() => setShow(true)}
+        className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
+      >
+        Manage
+      </button>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-96 overflow-y-auto">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold">Manage Surgery Inquiry</h2>
+          <button onClick={() => setShow(false)} className="text-gray-500">
+            <XCircle className="h-6 w-6" />
+          </button>
+        </div>
+        
+        <div className="mb-4 p-4 bg-gray-50 rounded">
+          <h3 className="font-semibold mb-2">Patient Information</h3>
+          <p><strong>Name:</strong> {inquiry.patient_name}</p>
+          <p><strong>Phone:</strong> {inquiry.patient_phone}</p>
+          <p><strong>Surgery:</strong> {inquiry.surgery_type}</p>
+          <p><strong>Condition:</strong> {inquiry.medical_condition}</p>
+          <p><strong>Budget:</strong> {inquiry.budget_range}</p>
+        </div>
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Hospital Details</label>
+            <textarea
+              className="w-full border rounded px-3 py-2 h-20"
+              placeholder="Enter hospital recommendations and details..."
+              value={formData.hospital_details}
+              onChange={(e) => setFormData({...formData, hospital_details: e.target.value})}
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Accommodation Details</label>
+            <textarea
+              className="w-full border rounded px-3 py-2 h-20"
+              placeholder="Enter accommodation options and details..."
+              value={formData.accommodation_details}
+              onChange={(e) => setFormData({...formData, accommodation_details: e.target.value})}
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Estimated Cost</label>
+            <input
+              type="text"
+              className="w-full border rounded px-3 py-2"
+              placeholder="e.g., $15,000 - $25,000"
+              value={formData.estimated_cost}
+              onChange={(e) => setFormData({...formData, estimated_cost: e.target.value})}
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <select
+              className="w-full border rounded px-3 py-2"
+              value={formData.status}
+              onChange={(e) => setFormData({...formData, status: e.target.value})}
+            >
+              <option value="pending">Pending</option>
+              <option value="in_progress">In Progress</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          
+          <div className="flex space-x-4">
+            <button
+              type="button"
+              onClick={() => setShow(false)}
+              className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+            >
+              Update Inquiry
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+const PricingForm = ({ tests, clinics, onSuccess }) => {
+  const [show, setShow] = useState(false);
+  const [formData, setFormData] = useState({
+    test_id: '',
+    clinic_id: '',
+    price_usd: '',
+    price_lrd: '',
+    is_available: true
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(`${API}/test-pricing`, {
+        ...formData,
+        price_usd: parseFloat(formData.price_usd),
+        price_lrd: parseFloat(formData.price_lrd)
+      });
+      setShow(false);
+      setFormData({
+        test_id: '',
+        clinic_id: '',
+        price_usd: '',
+        price_lrd: '',
+        is_available: true
+      });
+      onSuccess();
+      alert('Test pricing added successfully!');
+    } catch (error) {
+      console.error('Error adding pricing:', error);
+      alert('Error adding pricing');
+    }
+  };
+
+  if (!show) {
+    return (
+      <button
+        onClick={() => setShow(true)}
+        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center"
+      >
+        <Plus className="mr-2 h-4 w-4" />
+        Set Test Price
+      </button>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold">Set Test Pricing</h2>
+          <button onClick={() => setShow(false)} className="text-gray-500">
+            <XCircle className="h-6 w-6" />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Test</label>
+            <select
+              required
+              className="w-full border rounded px-3 py-2"
+              value={formData.test_id}
+              onChange={(e) => setFormData({...formData, test_id: e.target.value})}
+            >
+              <option value="">Select Test</option>
+              {tests.map(test => (
+                <option key={test.id} value={test.id}>{test.name}</option>
+              ))}
+            </select>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Clinic</label>
+            <select
+              required
+              className="w-full border rounded px-3 py-2"
+              value={formData.clinic_id}
+              onChange={(e) => setFormData({...formData, clinic_id: e.target.value})}
+            >
+              <option value="">Select Clinic</option>
+              {clinics.map(clinic => (
+                <option key={clinic.id} value={clinic.id}>{clinic.name}</option>
+              ))}
+            </select>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">USD Price</label>
+            <input
+              type="number"
+              step="0.01"
+              required
+              className="w-full border rounded px-3 py-2"
+              value={formData.price_usd}
+              onChange={(e) => setFormData({...formData, price_usd: e.target.value})}
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">LRD Price</label>
+            <input
+              type="number"
+              step="0.01"
+              required
+              className="w-full border rounded px-3 py-2"
+              value={formData.price_lrd}
+              onChange={(e) => setFormData({...formData, price_lrd: e.target.value})}
+            />
+          </div>
+          
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="available"
+              checked={formData.is_available}
+              onChange={(e) => setFormData({...formData, is_available: e.target.checked})}
+              className="mr-2"
+            />
+            <label htmlFor="available" className="text-sm text-gray-700">Available for booking</label>
+          </div>
+          
+          <div className="flex space-x-4">
+            <button
+              type="button"
+              onClick={() => setShow(false)}
+              className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+            >
+              Set Pricing
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
 };
 
 const ClinicForm = ({ onSuccess }) => {
