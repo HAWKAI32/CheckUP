@@ -2412,6 +2412,39 @@ const ClinicDashboard = () => {
             </div>
             <div className="px-6 py-2">
               <button
+                onClick={() => setActiveTab('tests')}
+                className={`flex items-center w-full px-2 py-2 text-sm rounded ${
+                  activeTab === 'tests' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <TestTube className="mr-3 h-4 w-4" />
+                Offered Tests
+              </button>
+            </div>
+            <div className="px-6 py-2">
+              <button
+                onClick={() => setActiveTab('checklist')}
+                className={`flex items-center w-full px-2 py-2 text-sm rounded ${
+                  activeTab === 'checklist' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <CheckCircle className="mr-3 h-4 w-4" />
+                Sample Checklist
+              </button>
+            </div>
+            <div className="px-6 py-2">
+              <button
+                onClick={() => setActiveTab('commissions')}
+                className={`flex items-center w-full px-2 py-2 text-sm rounded ${
+                  activeTab === 'commissions' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <DollarSign className="mr-3 h-4 w-4" />
+                Commissions
+              </button>
+            </div>
+            <div className="px-6 py-2">
+              <button
                 onClick={() => setActiveTab('profile')}
                 className={`flex items-center w-full px-2 py-2 text-sm rounded ${
                   activeTab === 'profile' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
