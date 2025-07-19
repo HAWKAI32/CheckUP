@@ -3090,35 +3090,35 @@ const ClinicDashboard = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
           <div className="flex items-center">
-            <Calendar className="h-8 w-8 text-blue-600 mr-3" />
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Bookings</p>
-              <p className="text-2xl font-bold text-gray-900">{bookings.length}</p>
+            <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 mr-3 flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Total Bookings</p>
+              <p className="text-lg sm:text-2xl font-bold text-gray-900">{bookings.length}</p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow">
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
           <div className="flex items-center">
-            <CheckCircle className="h-8 w-8 text-green-600 mr-3" />
-            <div>
-              <p className="text-sm font-medium text-gray-600">Completed</p>
-              <p className="text-2xl font-bold text-gray-900">
+            <CheckCircle className="h-6 w-6 sm:h-8 sm:w-8 text-green-600 mr-3 flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Completed</p>
+              <p className="text-lg sm:text-2xl font-bold text-gray-900">
                 {bookings.filter(b => b.status === 'completed').length}
               </p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow">
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow sm:col-span-2 lg:col-span-1">
           <div className="flex items-center">
-            <Clock className="h-8 w-8 text-yellow-600 mr-3" />
-            <div>
-              <p className="text-sm font-medium text-gray-600">Pending</p>
-              <p className="text-2xl font-bold text-gray-900">
+            <Clock className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-600 mr-3 flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Pending</p>
+              <p className="text-lg sm:text-2xl font-bold text-gray-900">
                 {bookings.filter(b => b.status === 'pending').length}
               </p>
             </div>
