@@ -470,7 +470,7 @@ async def create_booking(booking_data: BookingCreate):
 
 @api_router.get("/bookings", response_model=List[Booking])
 async def get_bookings(current_user: User = Depends(get_current_user)):
-    if current_user.role == UserRole.ADMIN:
+    if current_user.role in [UserRole.ADMIN, UserRole.SUB_ADMIN]:
         bookings = await db.bookings.find().to_list(1000)
     else:
         # Clinic users can only see bookings assigned to their clinic
