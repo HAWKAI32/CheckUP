@@ -997,15 +997,6 @@ const AdminDashboard = () => {
     }
   };
 
-  const fetchSurgeryInquiries = async () => {
-    try {
-      const response = await axios.get(`${API}/surgery-inquiries`);
-      setSurgeryInquiries(response.data);
-    } catch (error) {
-      console.error('Error fetching surgery inquiries:', error);
-    }
-  };
-
   if (user?.role !== 'admin') {
     return <Navigate to="/login" />;
   }
