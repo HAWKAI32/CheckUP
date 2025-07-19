@@ -1464,45 +1464,6 @@ const AdminDashboard = () => {
     // In a real implementation, this would fetch users from an endpoint
     // For now, we'll use the clinic data
   };
-
-  const handleEditTest = (test) => {
-    // Implementation for editing test
-    alert(`Edit test: ${test.name} (Feature to be implemented)`);
-  };
-
-  const handleDeleteTest = async (testId) => {
-    if (window.confirm('Are you sure you want to delete this test? This action cannot be undone.')) {
-      try {
-        await axios.delete(`${API}/tests/${testId}`);
-        fetchTests();
-        alert('Test deleted successfully!');
-      } catch (error) {
-        console.error('Error deleting test:', error);
-        alert('Error deleting test');
-      }
-    }
-  };
-
-  const handleEditProvider = (provider, type) => {
-    // Implementation for editing provider
-    alert(`Edit ${type}: ${provider.name} (Feature to be implemented)`);
-  };
-
-  const handleDeleteProvider = async (providerId, type) => {
-    if (window.confirm(`Are you sure you want to delete this ${type}? This will also delete their login account.`)) {
-      try {
-        if (type === 'clinic') {
-          await axios.delete(`${API}/clinics/${providerId}`);
-        }
-        // Also delete associated user account
-        fetchClinics();
-        alert(`${type} deleted successfully!`);
-      } catch (error) {
-        console.error(`Error deleting ${type}:`, error);
-        alert(`Error deleting ${type}`);
-      }
-    }
-  };
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Healthcare Provider Management</h2>
