@@ -919,10 +919,12 @@ class ChekUpTester:
         try:
             # Run all test suites
             self.test_authentication_system()
+            self.test_sub_admin_authentication()  # NEW: Test sub-admin authentication
             self.test_test_management()
             self.test_clinic_management()
             self.test_pricing_system()
             self.test_booking_system()
+            self.test_sub_admin_booking_access()  # NEW: Test sub-admin booking access
             self.test_file_upload_system()
             self.test_feedback_system()
             self.test_surgery_inquiry_system()
@@ -930,6 +932,8 @@ class ChekUpTester:
             self.test_search_functionality()
             self.test_public_endpoints()
             self.test_role_based_access_control()
+            self.test_sub_admin_access_restrictions()  # NEW: Test sub-admin restrictions
+            self.test_existing_functionality_integrity()  # NEW: Test existing functionality
             
         except Exception as e:
             print(f"\n❌ CRITICAL ERROR: {str(e)}")
