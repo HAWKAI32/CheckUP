@@ -1253,6 +1253,514 @@ const SurgeryInquiry = () => {
   );
 };
 
+const ClinicDashboard = () => {
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [bookings, setBookings] = useState([]);
+  const [myClinic, setMyClinic] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (user?.role === 'clinic') {
+      fetchClinicData();
+      fetchBookings();
+    }
+  }, [user]);
+
+  const fetchClinicData = async () => {
+    try {
+      const response = await axios.get(`${API}/clinics`);
+      const userClinic = response.data.find(clinic => clinic.user_id === user.id);
+      setMyClinic(userClinic);
+    } catch (error) {
+      console.error('Error fetching clinic data:', error);
+    }
+  };
+
+  const fetchBookings = async () => {
+    try {
+      const response = await axios.get(`${API}/bookings`);
+      setBookings(response.data);
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+    }
+  };
+
+  const updateBookingStatus = async (bookingId, status) => {
+    try {
+      await axios.put(`${API}/bookings/${bookingId}/status`, { status });
+      fetchBookings(); // Refresh bookings
+      alert('Booking status updated successfully!');
+    } catch (error) {
+      console.error('Error updating booking status:', error);
+      alert('Error updating booking status');
+    }
+  };
+
+  const handleFileUpload = async (bookingId, files) => {
+    try {
+      const formData = new FormData();
+      Array.from(files).forEach(file => {
+        formData.append('files', file);
+      });
+
+      await axios.post(`${API}/bookings/${bookingId}/upload-results`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      alert('Results uploaded successfully!');
+      fetchBookings(); // Refresh bookings
+    } catch (error) {
+      console.error('Error uploading results:', error);
+      alert('Error uploading results');
+    }
+  };
+
+  if (user?.role !== 'clinic') {
+    return <Navigate to="/login" />;
+  }
+
+  const renderDashboard = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold">Clinic Dashboard</h2>
+      
+      {myClinic && (
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-xl font-semibold mb-4">My Clinic Information</h3>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <p><strong>Name:</strong> {myClinic.name}</p>
+              <p><strong>Location:</strong> {myClinic.location}</p>
+              <p><strong>Phone:</strong> {myClinic.phone}</p>
+              <p><strong>Email:</strong> {myClinic.email}</p>
+            </div>
+            <div>
+              <p><strong>Rating:</strong> ⭐ {myClinic.rating}/5 ({myClinic.total_reviews} reviews)</p>
+              <p><strong>Status:</strong> Active</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="flex items-center">
+            <Calendar className="h-8 w-8 text-blue-600 mr-3" />
+            <div>
+              <p className="text-sm font-medium text-gray-600">Total Bookings</p>
+              <p className="text-2xl font-bold text-gray-900">{bookings.length}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="flex items-center">
+            <CheckCircle className="h-8 w-8 text-green-600 mr-3" />
+            <div>
+              <p className="text-sm font-medium text-gray-600">Completed</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {bookings.filter(b => b.status === 'completed').length}
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="flex items-center">
+            <Clock className="h-8 w-8 text-yellow-600 mr-3" />
+            <div>
+              <p className="text-sm font-medium text-gray-600">Pending</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {bookings.filter(b => b.status === 'pending').length}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderBookings = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold">Manage Bookings</h2>
+      
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Booking ID</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Patient</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tests</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {bookings.map(booking => (
+              <tr key={booking.id}>
+                <td className="px-6 py-4 whitespace-nowrap font-medium">{booking.booking_number}</td>
+                <td className="px-6 py-4">
+                  <div>
+                    <p className="font-medium">{booking.patient_name}</p>
+                    <p className="text-sm text-gray-500">{booking.patient_phone}</p>
+                  </div>
+                </td>
+                <td className="px-6 py-4">
+                  <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                    {booking.test_ids.length} test(s)
+                  </span>
+                </td>
+                <td className="px-6 py-4">
+                  <span className={`inline-block px-2 py-1 rounded text-xs ${
+                    booking.status === 'completed' ? 'bg-green-100 text-green-800' :
+                    booking.status === 'confirmed' ? 'bg-blue-100 text-blue-800' :
+                    booking.status === 'results_ready' ? 'bg-purple-100 text-purple-800' :
+                    'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {booking.status.replace('_', ' ')}
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  ${booking.total_amount.toFixed(2)}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap space-x-2">
+                  <select
+                    value={booking.status}
+                    onChange={(e) => updateBookingStatus(booking.id, e.target.value)}
+                    className="text-sm border rounded px-2 py-1"
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="sample_collected">Sample Collected</option>
+                    <option value="results_ready">Results Ready</option>
+                    <option value="completed">Completed</option>
+                  </select>
+                  
+                  {booking.status === 'sample_collected' && (
+                    <label className="cursor-pointer bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
+                      Upload Results
+                      <input
+                        type="file"
+                        multiple
+                        accept=".pdf,.jpg,.png,.docx"
+                        className="hidden"
+                        onChange={(e) => handleFileUpload(booking.id, e.target.files)}
+                      />
+                    </label>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        
+        {bookings.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-gray-500">No bookings assigned to your clinic yet.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  const renderProfile = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold">Clinic Profile</h2>
+      
+      {myClinic && (
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Clinic Name</label>
+              <input
+                type="text"
+                value={myClinic.name}
+                disabled
+                className="w-full border rounded px-3 py-2 bg-gray-50"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+              <input
+                type="text"
+                value={myClinic.location}
+                disabled
+                className="w-full border rounded px-3 py-2 bg-gray-50"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+              <input
+                type="text"
+                value={myClinic.phone}
+                disabled
+                className="w-full border rounded px-3 py-2 bg-gray-50"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input
+                type="email"
+                value={myClinic.email}
+                disabled
+                className="w-full border rounded px-3 py-2 bg-gray-50"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <textarea
+                value={myClinic.description}
+                disabled
+                className="w-full border rounded px-3 py-2 bg-gray-50 h-20"
+              />
+            </div>
+            
+            <p className="text-sm text-gray-600">
+              <strong>Note:</strong> Contact the administrator to update your clinic information.
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <div className="flex">
+        {/* Sidebar */}
+        <div className="w-64 bg-white shadow-lg">
+          <div className="p-6">
+            <h1 className="text-xl font-bold text-gray-800">Clinic Portal</h1>
+            <p className="text-sm text-gray-600">Welcome, {user.name}</p>
+          </div>
+          <nav className="mt-6">
+            <div className="px-6 py-2">
+              <button
+                onClick={() => setActiveTab('dashboard')}
+                className={`flex items-center w-full px-2 py-2 text-sm rounded ${
+                  activeTab === 'dashboard' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <BarChart3 className="mr-3 h-4 w-4" />
+                Dashboard
+              </button>
+            </div>
+            <div className="px-6 py-2">
+              <button
+                onClick={() => setActiveTab('bookings')}
+                className={`flex items-center w-full px-2 py-2 text-sm rounded ${
+                  activeTab === 'bookings' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <Calendar className="mr-3 h-4 w-4" />
+                Bookings
+              </button>
+            </div>
+            <div className="px-6 py-2">
+              <button
+                onClick={() => setActiveTab('profile')}
+                className={`flex items-center w-full px-2 py-2 text-sm rounded ${
+                  activeTab === 'profile' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <Settings className="mr-3 h-4 w-4" />
+                Profile
+              </button>
+            </div>
+          </nav>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1 p-8">
+          {activeTab === 'dashboard' && renderDashboard()}
+          {activeTab === 'bookings' && renderBookings()}
+          {activeTab === 'profile' && renderProfile()}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const UserRegistration = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    location: '',
+    role: 'clinic',
+    password: '',
+    confirmPassword: ''
+  });
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (formData.password !== formData.confirmPassword) {
+      alert('Passwords do not match!');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const registrationData = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        location: formData.location,
+        role: formData.role,
+        password: formData.password
+      };
+
+      await axios.post(`${API}/auth/register`, registrationData);
+      alert('Registration successful! Please contact admin to activate your account.');
+      navigate('/login');
+    } catch (error) {
+      console.error('Registration error:', error);
+      if (error.response?.status === 400 && error.response?.data?.detail?.includes('already registered')) {
+        alert('Email already registered. Please use a different email.');
+      } else {
+        alert('Registration failed. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
+      <div className="max-w-md w-full space-y-8">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Register as Healthcare Provider
+          </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Join ChekUp as a clinic or lab technician
+          </p>
+        </div>
+        <form className="mt-8 space-y-6 bg-white p-8 rounded-lg shadow" onSubmit={handleSubmit}>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Role
+            </label>
+            <select
+              value={formData.role}
+              onChange={(e) => setFormData({...formData, role: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="clinic">Clinic/Hospital</option>
+              <option value="lab_technician">Lab Technician</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {formData.role === 'clinic' ? 'Clinic/Hospital Name' : 'Full Name'}
+            </label>
+            <input
+              type="text"
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              value={formData.name}
+              onChange={(e) => setFormData({...formData, name: e.target.value})}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Email address
+            </label>
+            <input
+              type="email"
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              value={formData.email}
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              value={formData.phone}
+              onChange={(e) => setFormData({...formData, phone: e.target.value})}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Location
+            </label>
+            <input
+              type="text"
+              required
+              placeholder="City, Country"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              value={formData.location}
+              onChange={(e) => setFormData({...formData, location: e.target.value})}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Password
+            </label>
+            <input
+              type="password"
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              value={formData.password}
+              onChange={(e) => setFormData({...formData, password: e.target.value})}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              value={formData.confirmPassword}
+              onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+            />
+          </div>
+
+          <div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400"
+            >
+              {loading ? 'Registering...' : 'Register'}
+            </button>
+          </div>
+
+          <div className="text-center">
+            <Link to="/login" className="text-sm text-blue-600 hover:text-blue-500">
+              Already have an account? Sign in
+            </Link>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   const { user } = useAuth();
   
