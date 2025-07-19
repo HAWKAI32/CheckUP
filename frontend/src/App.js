@@ -2222,6 +2222,149 @@ const ClinicDashboard = () => {
     </div>
   );
 
+  const renderOfferedTests = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold">Offered Tests & Pricing</h2>
+      
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Test Name</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">USD Price</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">LRD Price</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {testPricing.map((item, index) => (
+              <tr key={index}>
+                <td className="px-6 py-4 whitespace-nowrap font-medium">{item.test?.name || 'Unknown Test'}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                    {item.test?.category || 'N/A'}
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">${item.pricing?.price_usd || '0.00'}</td>
+                <td className="px-6 py-4 whitespace-nowrap">L${item.pricing?.price_lrd || '0.00'}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className={`inline-block px-2 py-1 rounded text-xs ${
+                    item.pricing?.is_available ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  }`}>
+                    {item.pricing?.is_available ? 'Available' : 'Unavailable'}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        
+        {testPricing.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-gray-500">No tests configured yet. Contact admin to set up test pricing.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  const renderSampleChecklist = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold">Sample Collection Checklist</h2>
+      
+      <div className="bg-white rounded-lg shadow p-6">
+        <h3 className="text-lg font-semibold mb-4">Pre-Collection Safety Protocol</h3>
+        <div className="space-y-3">
+          {[
+            'Verify patient identity with valid ID',
+            'Confirm test requirements and fasting status',
+            'Check sample collection containers and labels',
+            'Ensure sterile collection environment',
+            'Use proper PPE (gloves, mask, sanitizer)',
+            'Label samples immediately after collection',
+            'Document collection time and conditions',
+            'Store samples at correct temperature',
+            'Complete chain of custody documentation',
+            'Prepare samples for transport to lab'
+          ].map((item, index) => (
+            <div key={index} className="flex items-center space-x-3">
+              <input type="checkbox" className="h-4 w-4 text-blue-600" />
+              <label className="text-sm text-gray-700">{item}</label>
+            </div>
+          ))}
+        </div>
+        
+        <div className="mt-6 p-4 bg-yellow-50 rounded-lg">
+          <h4 className="font-semibold text-yellow-800 mb-2">Important Notes:</h4>
+          <ul className="text-sm text-yellow-700 space-y-1">
+            <li>• Always follow universal precautions</li>
+            <li>• Document any collection issues or patient concerns</li>
+            <li>• Contact lab immediately for urgent samples</li>
+            <li>• Ensure proper transport conditions maintained</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderCommissions = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold">Commission Summary</h2>
+      
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="px-6 py-4 bg-gray-50 border-b">
+          <h3 className="text-lg font-semibold">Auto-Generated Invoices</h3>
+        </div>
+        
+        <div className="p-6">
+          <div className="grid md:grid-cols-3 gap-6 mb-6">
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <h4 className="font-semibold text-blue-800">This Month</h4>
+              <p className="text-2xl font-bold text-blue-900">$0.00</p>
+              <p className="text-sm text-blue-600">0 completed tests</p>
+            </div>
+            <div className="bg-green-50 p-4 rounded-lg">
+              <h4 className="font-semibold text-green-800">Total Earnings</h4>
+              <p className="text-2xl font-bold text-green-900">$0.00</p>
+              <p className="text-sm text-green-600">0 total tests</p>
+            </div>
+            <div className="bg-yellow-50 p-4 rounded-lg">
+              <h4 className="font-semibold text-yellow-800">Pending</h4>
+              <p className="text-2xl font-bold text-yellow-900">$0.00</p>
+              <p className="text-sm text-yellow-600">0 pending payments</p>
+            </div>
+          </div>
+          
+          <h4 className="font-semibold mb-4">Recent Invoices</h4>
+          <div className="space-y-4">
+            {bookings.filter(b => b.status === 'completed').length === 0 ? (
+              <p className="text-gray-500 text-center py-8">No completed tests yet. Commission invoices will appear here.</p>
+            ) : (
+              bookings.filter(b => b.status === 'completed').map(booking => (
+                <div key={booking.id} className="border rounded-lg p-4">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h5 className="font-semibold">{booking.booking_number}</h5>
+                      <p className="text-sm text-gray-600">Patient: {booking.patient_name}</p>
+                      <p className="text-sm text-gray-600">Tests: {booking.test_ids.length}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-green-600">
+                        Commission: ${(booking.total_amount * 0.15).toFixed(2)}
+                      </p>
+                      <p className="text-sm text-gray-500">15% of ${booking.total_amount}</p>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="flex">
