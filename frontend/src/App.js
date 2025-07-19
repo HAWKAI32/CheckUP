@@ -3423,90 +3423,85 @@ const ClinicDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="flex">
+        {/* Mobile menu backdrop */}
+        {sidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+        
         {/* Sidebar */}
-        <div className="w-64 bg-white shadow-lg">
-          <div className="p-6">
-            <h1 className="text-xl font-bold text-gray-800">Clinic Portal</h1>
-            <p className="text-sm text-gray-600">Welcome, {user.name}</p>
+        <div className={`${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}>
+          <div className="p-4 sm:p-6 border-b lg:border-none">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-lg sm:text-xl font-bold text-gray-800">Clinic Portal</h1>
+                <p className="text-xs sm:text-sm text-gray-600">Welcome, {user.name}</p>
+              </div>
+              <button
+                className="lg:hidden p-2"
+                onClick={() => setSidebarOpen(false)}
+              >
+                <XCircle className="h-5 w-5" />
+              </button>
+            </div>
           </div>
-          <nav className="mt-6">
-            <div className="px-6 py-2">
-              <button
-                onClick={() => setActiveTab('dashboard')}
-                className={`flex items-center w-full px-2 py-2 text-sm rounded ${
-                  activeTab === 'dashboard' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                <BarChart3 className="mr-3 h-4 w-4" />
-                Dashboard
-              </button>
-            </div>
-            <div className="px-6 py-2">
-              <button
-                onClick={() => setActiveTab('bookings')}
-                className={`flex items-center w-full px-2 py-2 text-sm rounded ${
-                  activeTab === 'bookings' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                <Calendar className="mr-3 h-4 w-4" />
-                Bookings
-              </button>
-            </div>
-            <div className="px-6 py-2">
-              <button
-                onClick={() => setActiveTab('tests')}
-                className={`flex items-center w-full px-2 py-2 text-sm rounded ${
-                  activeTab === 'tests' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                <TestTube className="mr-3 h-4 w-4" />
-                Offered Tests
-              </button>
-            </div>
-            <div className="px-6 py-2">
-              <button
-                onClick={() => setActiveTab('checklist')}
-                className={`flex items-center w-full px-2 py-2 text-sm rounded ${
-                  activeTab === 'checklist' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                <CheckCircle className="mr-3 h-4 w-4" />
-                Sample Checklist
-              </button>
-            </div>
-            <div className="px-6 py-2">
-              <button
-                onClick={() => setActiveTab('commissions')}
-                className={`flex items-center w-full px-2 py-2 text-sm rounded ${
-                  activeTab === 'commissions' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                <DollarSign className="mr-3 h-4 w-4" />
-                Commissions
-              </button>
-            </div>
-            <div className="px-6 py-2">
-              <button
-                onClick={() => setActiveTab('profile')}
-                className={`flex items-center w-full px-2 py-2 text-sm rounded ${
-                  activeTab === 'profile' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                <Settings className="mr-3 h-4 w-4" />
-                Profile
-              </button>
-            </div>
+          <nav className="mt-4 sm:mt-6">
+            {[
+              { tab: 'dashboard', icon: BarChart3, label: 'Dashboard' },
+              { tab: 'bookings', icon: Calendar, label: 'Bookings' },
+              { tab: 'tests', icon: TestTube, label: 'Offered Tests' },
+              { tab: 'checklist', icon: CheckCircle, label: 'Sample Checklist' },
+              { tab: 'commissions', icon: DollarSign, label: 'Commissions' },
+              { tab: 'profile', icon: Settings, label: 'Profile' },
+            ].map(({ tab, icon: Icon, label }) => (
+              <div key={tab} className="px-4 sm:px-6 py-1 sm:py-2">
+                <button
+                  onClick={() => {
+                    setActiveTab(tab);
+                    setSidebarOpen(false);
+                  }}
+                  className={`flex items-center w-full px-2 py-2 text-sm rounded transition-colors ${
+                    activeTab === tab ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  <Icon className="mr-3 h-4 w-4 flex-shrink-0" />
+                  <span>{label}</span>
+                </button>
+              </div>
+            ))}
           </nav>
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 p-8">
-          {activeTab === 'dashboard' && renderDashboard()}
-          {activeTab === 'bookings' && renderBookings()}
-          {activeTab === 'tests' && renderOfferedTests()}
-          {activeTab === 'checklist' && renderSampleChecklist()}
-          {activeTab === 'commissions' && renderCommissions()}
-          {activeTab === 'profile' && renderProfile()}
+        <div className="flex-1 flex flex-col">
+          {/* Mobile header */}
+          <div className="lg:hidden bg-white shadow-sm border-b px-4 py-3">
+            <div className="flex items-center justify-between">
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+              >
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+              <h1 className="text-lg font-semibold text-gray-900">Clinic Portal</h1>
+              <div></div>
+            </div>
+          </div>
+          
+          <div className="flex-1 p-4 sm:p-6 lg:p-8">
+            {activeTab === 'dashboard' && renderDashboard()}
+            {activeTab === 'bookings' && renderBookings()}
+            {activeTab === 'tests' && renderOfferedTests()}
+            {activeTab === 'checklist' && renderSampleChecklist()}
+            {activeTab === 'commissions' && renderCommissions()}
+            {activeTab === 'profile' && renderProfile()}
+          </div>
         </div>
       </div>
     </div>
