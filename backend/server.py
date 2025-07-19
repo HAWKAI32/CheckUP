@@ -790,7 +790,7 @@ async def startup_event():
                 "phone": "+231-777-123456",
                 "location": "Monrovia, Liberia",
                 "role": UserRole.SUB_ADMIN.value,
-                "hashed_password": hashed_password,
+                "password": hashed_password,
                 "is_active": True,
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow()
