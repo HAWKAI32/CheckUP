@@ -1153,16 +1153,9 @@ const AdminDashboard = () => {
   const renderUserManagement = () => (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">User Management</h2>
+        <h2 className="text-2xl font-bold">Healthcare Provider Management</h2>
         <div className="space-x-2">
-          <UserForm onSuccess={() => window.location.reload()} />
-          <Link 
-            to="/register"
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 inline-flex items-center"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Register New User
-          </Link>
+          <UserForm onSuccess={fetchClinics} />
         </div>
       </div>
       
@@ -1216,6 +1209,13 @@ const AdminDashboard = () => {
             </tr>
           </tbody>
         </table>
+        
+        <div className="px-6 py-4 bg-gray-50 border-t">
+          <p className="text-sm text-gray-600">
+            <strong>Note:</strong> Use "Create Healthcare Provider Account" to add new clinics, hospitals, or lab technicians. 
+            Each provider will receive login credentials to access their dedicated portal.
+          </p>
+        </div>
       </div>
     </div>
   );
