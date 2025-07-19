@@ -287,22 +287,22 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-12 sm:py-16 lg:py-20">
         <div className="container mx-auto px-4 text-center">
           <img 
             src="https://images.unsplash.com/photo-1638202993928-7267aad84c31?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzd8MHwxfHNlYXJjaHwxfHxtZWRpY2FsfGVufDB8fHxibHVlfDE3NTI4ODA5NzB8MA&ixlib=rb-4.1.0&q=85"
             alt="Professional Healthcare"
-            className="mx-auto mb-8 rounded-lg shadow-lg w-64 h-48 object-cover"
+            className="mx-auto mb-6 sm:mb-8 rounded-lg shadow-lg w-48 sm:w-64 h-36 sm:h-48 object-cover"
           />
-          <h1 className="text-5xl font-bold mb-4">Welcome to ChekUp</h1>
-          <p className="text-xl mb-8">Simplifying access to medical lab testing and international surgical assistance</p>
-          <div className="max-w-md mx-auto">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">Welcome to ChekUp</h1>
+          <p className="text-lg sm:text-xl mb-6 sm:mb-8 max-w-2xl mx-auto">Simplifying access to medical lab testing and international surgical assistance</p>
+          <div className="max-w-sm sm:max-w-md mx-auto">
             <div className="relative">
-              <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+              <Search className="absolute left-3 top-3 h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search tests or clinics..."
-                className="w-full pl-10 pr-4 py-3 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                className="w-full pl-9 sm:pl-10 pr-4 py-2.5 sm:py-3 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300 text-sm sm:text-base"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -311,8 +311,8 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid md:grid-cols-2 gap-8">
+      <div className="container mx-auto px-4 py-6 sm:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
           {/* Browse by Tests */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-2xl font-bold mb-4 flex items-center">
