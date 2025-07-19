@@ -188,7 +188,19 @@ const Header = () => {
               
               {user ? (
                 <>
-                  <span className="text-sm">Welcome, {user.name}</span>
+                  <Link
+                    to={getDashboardLink()}
+                    className="flex items-center justify-center space-x-1 bg-blue-700 px-3 py-2 rounded hover:bg-blue-800 text-sm"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <BarChart3 className="h-4 w-4" />
+                    <span>Dashboard</span>
+                  </Link>
+                  <span className="text-sm text-center">
+                    {user.role === 'sub_admin' ? 'Sub-Admin' : 
+                     user.role === 'lab_technician' ? 'Lab Tech' : 
+                     user.role.charAt(0).toUpperCase() + user.role.slice(1)}: {user.name}
+                  </span>
                   <button
                     onClick={handleLogout}
                     className="flex items-center justify-center space-x-1 bg-blue-700 px-3 py-2 rounded hover:bg-blue-800 text-sm"
