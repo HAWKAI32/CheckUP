@@ -864,57 +864,57 @@ const SubAdminDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="bg-white shadow">
-        <div className="px-6 py-4">
-          <h1 className="text-2xl font-bold text-gray-800">Sub-Admin Dashboard</h1>
-          <p className="text-sm text-gray-600">Booking Coordinator - {user.name}</p>
+        <div className="px-4 sm:px-6 py-4">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Sub-Admin Dashboard</h1>
+          <p className="text-xs sm:text-sm text-gray-600">Booking Coordinator - {user.name}</p>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-6 sm:py-8">
         {/* Booking Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
             <div className="flex items-center">
-              <AlertCircle className="h-8 w-8 text-yellow-600 mr-3" />
-              <div>
-                <p className="text-sm font-medium text-gray-600">New Bookings</p>
-                <p className="text-2xl font-bold text-gray-900">
+              <AlertCircle className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-600 mr-2 sm:mr-3 flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">New Bookings</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">
                   {bookings.filter(b => b.status === 'pending').length}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
             <div className="flex items-center">
-              <Clock className="h-8 w-8 text-blue-600 mr-3" />
-              <div>
-                <p className="text-sm font-medium text-gray-600">In Progress</p>
-                <p className="text-2xl font-bold text-gray-900">
+              <Clock className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 mr-2 sm:mr-3 flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">In Progress</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">
                   {bookings.filter(b => ['confirmed', 'sample_collected'].includes(b.status)).length}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
             <div className="flex items-center">
-              <FileText className="h-8 w-8 text-purple-600 mr-3" />
-              <div>
-                <p className="text-sm font-medium text-gray-600">Results Ready</p>
-                <p className="text-2xl font-bold text-gray-900">
+              <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-purple-600 mr-2 sm:mr-3 flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Results Ready</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">
                   {bookings.filter(b => b.status === 'results_ready').length}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
             <div className="flex items-center">
-              <CheckCircle className="h-8 w-8 text-green-600 mr-3" />
-              <div>
-                <p className="text-sm font-medium text-gray-600">Completed</p>
-                <p className="text-2xl font-bold text-gray-900">
+              <CheckCircle className="h-6 w-6 sm:h-8 sm:w-8 text-green-600 mr-2 sm:mr-3 flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Completed</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">
                   {bookings.filter(b => b.status === 'completed').length}
                 </p>
               </div>
