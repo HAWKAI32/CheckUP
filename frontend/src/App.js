@@ -1158,6 +1158,187 @@ const AdminDashboard = () => {
     </div>
   );
 
+  const renderUserManagement = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold">User Management</h2>
+        <div className="space-x-2">
+          <UserForm onSuccess={() => window.location.reload()} />
+          <Link 
+            to="/register"
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 inline-flex items-center"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Register New User
+          </Link>
+        </div>
+      </div>
+      
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Location</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            <tr>
+              <td className="px-6 py-4 whitespace-nowrap font-medium">ChekUp Administrator</td>
+              <td className="px-6 py-4 whitespace-nowrap">admin@chekup.com</td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded">Admin</span>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">Monrovia, Liberia</td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Active</span>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <button className="text-blue-600 hover:text-blue-800 mr-2">
+                  <Edit className="h-4 w-4" />
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td className="px-6 py-4 whitespace-nowrap font-medium">Monrovia Health Center</td>
+              <td className="px-6 py-4 whitespace-nowrap">clinic@healthcenter.lr</td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Clinic</span>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">Sinkor, Monrovia</td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Active</span>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <button className="text-blue-600 hover:text-blue-800 mr-2">
+                  <Edit className="h-4 w-4" />
+                </button>
+                <button className="text-red-600 hover:text-red-800">
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
+  const renderNotifications = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold">Notification Center</h2>
+      
+      <div className="bg-white rounded-lg shadow">
+        <div className="px-6 py-4 border-b">
+          <h3 className="text-lg font-semibold">Recent Alerts</h3>
+        </div>
+        <div className="p-6">
+          <div className="space-y-4">
+            <div className="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg">
+              <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+              <div>
+                <p className="font-medium text-blue-800">New Booking Created</p>
+                <p className="text-sm text-blue-600">Sarah Johnson booked CBC test - CHK-16C35149</p>
+                <p className="text-xs text-blue-500">2 hours ago</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start space-x-3 p-3 bg-green-50 rounded-lg">
+              <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
+              <div>
+                <p className="font-medium text-green-800">Test Results Uploaded</p>
+                <p className="text-sm text-green-600">Monrovia Health Center uploaded results for CHK-16C35149</p>
+                <p className="text-xs text-green-500">1 hour ago</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start space-x-3 p-3 bg-yellow-50 rounded-lg">
+              <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5" />
+              <div>
+                <p className="font-medium text-yellow-800">Surgery Inquiry Pending</p>
+                <p className="text-sm text-yellow-600">New heart surgery inquiry requires hospital coordination</p>
+                <p className="text-xs text-yellow-500">3 hours ago</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderSurgeryHospitals = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold">Indian Hospitals & Accommodation</h2>
+        <HospitalForm onSuccess={() => window.location.reload()} />
+      </div>
+      
+      <div className="grid md:grid-cols-2 gap-6">
+        <div className="bg-white rounded-lg shadow">
+          <div className="px-6 py-4 border-b">
+            <h3 className="text-lg font-semibold">Partner Hospitals</h3>
+          </div>
+          <div className="p-6">
+            <div className="space-y-4">
+              <div className="border rounded-lg p-4">
+                <h4 className="font-semibold">Apollo Hospitals Delhi</h4>
+                <p className="text-sm text-gray-600">Multi-specialty hospital with cardiac surgery excellence</p>
+                <p className="text-sm text-blue-600">Contact: +91-11-2692-5858</p>
+                <div className="mt-2 flex space-x-2">
+                  <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Cardiology</span>
+                  <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Orthopedics</span>
+                </div>
+              </div>
+              
+              <div className="border rounded-lg p-4">
+                <h4 className="font-semibold">Fortis Healthcare Mumbai</h4>
+                <p className="text-sm text-gray-600">Advanced surgical procedures and organ transplants</p>
+                <p className="text-sm text-blue-600">Contact: +91-22-6754-5000</p>
+                <div className="mt-2 flex space-x-2">
+                  <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">Oncology</span>
+                  <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded">Neurosurgery</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-white rounded-lg shadow">
+          <div className="px-6 py-4 border-b">
+            <h3 className="text-lg font-semibold">Accommodation Options</h3>
+          </div>
+          <div className="p-6">
+            <div className="space-y-4">
+              <div className="border rounded-lg p-4">
+                <h4 className="font-semibold">Budget Guest House Near Apollo</h4>
+                <p className="text-sm text-gray-600">Clean, affordable accommodation 2km from hospital</p>
+                <p className="text-sm text-green-600">₹1,500/night (~$18)</p>
+                <div className="mt-2">
+                  <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">WiFi</span>
+                  <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Meals</span>
+                </div>
+              </div>
+              
+              <div className="border rounded-lg p-4">
+                <h4 className="font-semibold">Serviced Apartments Mumbai</h4>
+                <p className="text-sm text-gray-600">Family-friendly apartments with kitchen facilities</p>
+                <p className="text-sm text-green-600">₹3,000/night (~$36)</p>
+                <div className="mt-2">
+                  <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Kitchen</span>
+                  <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">AC</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="flex">
