@@ -2099,6 +2099,8 @@ const ProviderForm = ({ onSuccess }) => {
     </div>
   );
 };
+
+const UserForm = ({ onSuccess }) => {
   const [show, setShow] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
