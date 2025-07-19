@@ -1465,13 +1465,13 @@ const AdminDashboard = () => {
           <nav className="mt-6">
             <div className="px-6 py-2">
               <button
-                onClick={() => setActiveTab('dashboard')}
+                onClick={() => setActiveTab('bookings')}
                 className={`flex items-center w-full px-2 py-2 text-sm rounded ${
-                  activeTab === 'dashboard' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
+                  activeTab === 'bookings' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
-                <BarChart3 className="mr-3 h-4 w-4" />
-                Dashboard
+                <Calendar className="mr-3 h-4 w-4" />
+                Booking Information
               </button>
             </div>
             <div className="px-6 py-2">
@@ -1482,84 +1482,18 @@ const AdminDashboard = () => {
                 }`}
               >
                 <TestTube className="mr-3 h-4 w-4" />
-                Lab Tests
+                Test Management
               </button>
             </div>
             <div className="px-6 py-2">
               <button
-                onClick={() => setActiveTab('clinics')}
+                onClick={() => setActiveTab('providers')}
                 className={`flex items-center w-full px-2 py-2 text-sm rounded ${
-                  activeTab === 'clinics' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
+                  activeTab === 'providers' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
                 <Building className="mr-3 h-4 w-4" />
-                Clinics
-              </button>
-            </div>
-            <div className="px-6 py-2">
-              <button
-                onClick={() => setActiveTab('pricing')}
-                className={`flex items-center w-full px-2 py-2 text-sm rounded ${
-                  activeTab === 'pricing' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                <DollarSign className="mr-3 h-4 w-4" />
-                Test Pricing
-              </button>
-            </div>
-            <div className="px-6 py-2">
-              <button
-                onClick={() => setActiveTab('bookings')}
-                className={`flex items-center w-full px-2 py-2 text-sm rounded ${
-                  activeTab === 'bookings' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                <Calendar className="mr-3 h-4 w-4" />
-                Bookings
-              </button>
-            </div>
-            <div className="px-6 py-2">
-              <button
-                onClick={() => setActiveTab('surgery')}
-                className={`flex items-center w-full px-2 py-2 text-sm rounded ${
-                  activeTab === 'surgery' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                <Heart className="mr-3 h-4 w-4" />
-                Surgery Inquiries
-              </button>
-            </div>
-            <div className="px-6 py-2">
-              <button
-                onClick={() => setActiveTab('users')}
-                className={`flex items-center w-full px-2 py-2 text-sm rounded ${
-                  activeTab === 'users' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                <Users className="mr-3 h-4 w-4" />
-                User Management
-              </button>
-            </div>
-            <div className="px-6 py-2">
-              <button
-                onClick={() => setActiveTab('notifications')}
-                className={`flex items-center w-full px-2 py-2 text-sm rounded ${
-                  activeTab === 'notifications' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                <AlertCircle className="mr-3 h-4 w-4" />
-                Notifications
-              </button>
-            </div>
-            <div className="px-6 py-2">
-              <button
-                onClick={() => setActiveTab('hospitals')}
-                className={`flex items-center w-full px-2 py-2 text-sm rounded ${
-                  activeTab === 'hospitals' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                <Building className="mr-3 h-4 w-4" />
-                Surgery Hospitals
+                Clinic/Hospital & Lab Technician Management
               </button>
             </div>
           </nav>
@@ -1567,15 +1501,9 @@ const AdminDashboard = () => {
 
         {/* Main Content */}
         <div className="flex-1 p-8">
-          {activeTab === 'dashboard' && renderDashboard()}
-          {activeTab === 'tests' && renderTests()}
-          {activeTab === 'clinics' && renderClinics()}
-          {activeTab === 'pricing' && renderPricing()}
           {activeTab === 'bookings' && renderBookings()}
-          {activeTab === 'surgery' && renderSurgeryInquiries()}
-          {activeTab === 'users' && renderUserManagement()}
-          {activeTab === 'notifications' && renderNotifications()}
-          {activeTab === 'hospitals' && renderSurgeryHospitals()}
+          {activeTab === 'tests' && renderTestManagement()}
+          {activeTab === 'providers' && renderProviderManagement()}
         </div>
       </div>
     </div>
