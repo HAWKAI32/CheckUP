@@ -957,21 +957,17 @@ const SubAdminDashboard = () => {
 
 const AdminDashboard = () => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const [analytics, setAnalytics] = useState(null);
+  const [activeTab, setActiveTab] = useState('bookings');
   const [tests, setTests] = useState([]);
   const [clinics, setClinics] = useState([]);
   const [bookings, setBookings] = useState([]);
-  const [surgeryInquiries, setSurgeryInquiries] = useState([]);
   
   useEffect(() => {
     if (user?.role !== 'admin') return;
     
-    fetchAnalytics();
     fetchTests();
     fetchClinics();
     fetchBookings();
-    fetchSurgeryInquiries();
   }, [user]);
 
   const fetchAnalytics = async () => {
