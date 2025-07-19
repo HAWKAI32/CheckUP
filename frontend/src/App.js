@@ -954,6 +954,8 @@ const SubAdminDashboard = () => {
     </div>
   );
 };
+
+const AdminDashboard = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [analytics, setAnalytics] = useState(null);
