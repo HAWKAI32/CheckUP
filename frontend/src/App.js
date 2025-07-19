@@ -1784,12 +1784,21 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<UserRegistration />} />
             <Route path="/surgery-inquiry" element={<SurgeryInquiry />} />
             <Route 
               path="/admin/*" 
               element={
                 <ProtectedRoute allowedRoles={['admin']}>
                   <AdminDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/clinic-dashboard" 
+              element={
+                <ProtectedRoute allowedRoles={['clinic', 'lab_technician']}>
+                  <ClinicDashboard />
                 </ProtectedRoute>
               } 
             />
