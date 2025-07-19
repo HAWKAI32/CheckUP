@@ -380,17 +380,17 @@ const Home = () => {
 
         {/* Test Pricing Display */}
         {testPricing.length > 0 && (
-          <div className="mt-8 bg-white rounded-lg shadow-md p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold">
+          <div className="mt-6 sm:mt-8 bg-white rounded-lg shadow-md p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 mb-4">
+              <h2 className="text-xl sm:text-2xl font-bold">
                 {selectedClinic ? `${selectedClinic.name} - Available Tests` : 'Available Providers'}
               </h2>
               <div className="flex items-center space-x-2">
-                <span>Currency:</span>
+                <span className="text-sm">Currency:</span>
                 <select 
                   value={currency}
                   onChange={(e) => setCurrency(e.target.value)}
-                  className="border rounded px-3 py-1"
+                  className="border rounded px-3 py-1 text-sm"
                 >
                   <option value="USD">USD</option>
                   <option value="LRD">LRD</option>
@@ -398,20 +398,20 @@ const Home = () => {
               </div>
             </div>
             
-            <div className="grid gap-4">
+            <div className="grid gap-3 sm:gap-4">
               {testPricing.map((item, index) => (
-                <div key={index} className="border rounded-lg p-4">
-                  <div className="flex items-center justify-between">
+                <div key={index} className="border rounded-lg p-3 sm:p-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
                     <div className="flex-1">
-                      <h3 className="font-semibold">{item.test.name}</h3>
-                      <p className="text-sm text-gray-600 mb-2">{item.test.description}</p>
+                      <h3 className="font-semibold text-base">{item.test.name}</h3>
+                      <p className="text-sm text-gray-600 mb-2 line-clamp-2">{item.test.description}</p>
                       <div className="flex items-center text-sm text-gray-500">
-                        <Building className="h-4 w-4 mr-1" />
-                        {item.clinic.name} - {item.clinic.location}
+                        <Building className="h-3 w-3 sm:h-4 sm:w-4 mr-1 flex-shrink-0" />
+                        <span className="truncate">{item.clinic.name} - {item.clinic.location}</span>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-blue-600">
+                    <div className="flex items-center justify-between sm:block sm:text-right sm:ml-4">
+                      <div className="text-xl sm:text-2xl font-bold text-blue-600">
                         {currency === 'USD' ? '$' : 'L$'}{currency === 'USD' ? item.pricing.price_usd : item.pricing.price_lrd}
                       </div>
                       <button
@@ -419,7 +419,7 @@ const Home = () => {
                           addTestToCart(item);
                           setSelectedClinic(item.clinic);
                         }}
-                        className="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                        className="bg-blue-600 text-white px-3 sm:px-4 py-2 rounded hover:bg-blue-700 text-sm"
                       >
                         Add to Cart
                       </button>
