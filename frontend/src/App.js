@@ -1678,13 +1678,6 @@ const AdminDashboard = () => {
     }
   };
 
-  const [users, setUsers] = useState([]);
-
-  const fetchUsers = async () => {
-    // In a real implementation, this would fetch users from an endpoint
-    // For now, we'll use the clinic data
-  };
-
   const renderNotifications = () => (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Notification Center</h2>
