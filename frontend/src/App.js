@@ -3714,6 +3714,14 @@ function App() {
               } 
             />
             <Route 
+              path="/sub-admin/*" 
+              element={
+                <ProtectedRoute allowedRoles={['sub_admin']}>
+                  <SubAdminDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
               path="/clinic-dashboard" 
               element={
                 <ProtectedRoute allowedRoles={['clinic', 'lab_technician']}>
