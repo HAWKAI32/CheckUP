@@ -774,6 +774,35 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+@app.on_event("startup")
+async def startup_event():
+    """Initialize default users on startup"""
+    try:
+        # Check if sub-admin user exists
+        existing_subadmin = await db.users.find_one({"email": "subadmin@chekup.com"})
+        if not existing_subadmin:
+            # Create default sub-admin user
+            hashed_password = pwd_context.hash("SubAdminPass123!")
+            subadmin_user = {
+                "id": str(uuid.uuid4()),
+                "name": "ChekUp Sub Administrator",
+                "email": "subadmin@chekup.com",
+                "phone": "+231-777-123456",
+                "location": "Monrovia, Liberia",
+                "role": UserRole.SUB_ADMIN.value,
+                "hashed_password": hashed_password,
+                "is_active": True,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
+            await db.users.insert_one(subadmin_user)
+            logger.info("Created default sub-admin user: subadmin@chekup.com")
+        else:
+            logger.info("Sub-admin user already exists")
+            
+    except Exception as e:
+        logger.error(f"Error creating default sub-admin user: {e}")
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
