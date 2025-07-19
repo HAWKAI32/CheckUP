@@ -924,21 +924,21 @@ const SubAdminDashboard = () => {
 
         {/* Booking Management Table */}
         <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="px-6 py-4 border-b">
-            <h2 className="text-lg font-semibold">Booking Coordination</h2>
-            <p className="text-sm text-gray-600">Assign bookings to clinics and coordinate results delivery</p>
+          <div className="px-4 sm:px-6 py-4 border-b">
+            <h2 className="text-base sm:text-lg font-semibold">Booking Coordination</h2>
+            <p className="text-xs sm:text-sm text-gray-600">Assign bookings to clinics and coordinate results delivery</p>
           </div>
           
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Booking ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Patient</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tests</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Assigned Clinic</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Coordinator Actions</th>
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Booking ID</th>
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Patient</th>
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tests</th>
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Assigned Clinic</th>
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Coordinator Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -946,30 +946,30 @@ const SubAdminDashboard = () => {
                   const clinic = clinics.find(c => c.id === booking.clinic_id);
                   return (
                     <tr key={booking.id}>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                         <div>
-                          <p className="font-medium text-sm">{booking.booking_number}</p>
+                          <p className="font-medium text-xs sm:text-sm">{booking.booking_number}</p>
                           <p className="text-xs text-gray-500">
                             {new Date(booking.created_at).toLocaleDateString()}
                           </p>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 sm:px-6 py-4">
                         <div>
-                          <p className="font-medium">{booking.patient_name}</p>
-                          <p className="text-sm text-gray-500">{booking.patient_phone}</p>
+                          <p className="font-medium text-sm">{booking.patient_name}</p>
+                          <p className="text-xs sm:text-sm text-gray-500">{booking.patient_phone}</p>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 sm:px-6 py-4">
                         <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
                           {booking.test_ids.length} test(s)
                         </span>
                       </td>
-                      <td className="px-6 py-4">
-                        <p className="font-medium">{clinic?.name || 'Not Assigned'}</p>
-                        {clinic && <p className="text-sm text-gray-500">{clinic.location}</p>}
+                      <td className="px-3 sm:px-6 py-4 hidden sm:table-cell">
+                        <p className="font-medium text-sm">{clinic?.name || 'Not Assigned'}</p>
+                        {clinic && <p className="text-xs text-gray-500">{clinic.location}</p>}
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 sm:px-6 py-4">
                         <span className={`inline-block px-2 py-1 rounded text-xs ${
                           booking.status === 'completed' ? 'bg-green-100 text-green-800' :
                           booking.status === 'results_ready' ? 'bg-purple-100 text-purple-800' :
@@ -985,7 +985,7 @@ const SubAdminDashboard = () => {
                            booking.status.toUpperCase()}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 sm:px-6 py-4">
                         <div className="space-y-2">
                           {booking.status === 'pending' && (
                             <select 
@@ -1013,13 +1013,13 @@ const SubAdminDashboard = () => {
                           )}
 
                           {['confirmed', 'sample_collected'].includes(booking.status) && (
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-gray-500 text-center">
                               Waiting for clinic...
                             </div>
                           )}
 
                           {booking.status === 'completed' && (
-                            <div className="text-xs text-green-600">
+                            <div className="text-xs text-green-600 text-center">
                               ✓ Completed & Sent
                             </div>
                           )}
