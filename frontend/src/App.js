@@ -970,15 +970,6 @@ const AdminDashboard = () => {
     fetchBookings();
   }, [user]);
 
-  const fetchAnalytics = async () => {
-    try {
-      const response = await axios.get(`${API}/analytics/dashboard`);
-      setAnalytics(response.data);
-    } catch (error) {
-      console.error('Error fetching analytics:', error);
-    }
-  };
-
   const fetchTests = async () => {
     try {
       const response = await axios.get(`${API}/tests`);
