@@ -124,21 +124,13 @@ const Header = () => {
                 </button>
               </div>
             ) : (
-              <div className="flex items-center space-x-2">
-                <Link 
-                  to="/register"
-                  className="bg-green-600 px-3 py-1 rounded hover:bg-green-700"
-                >
-                  Register
-                </Link>
-                <Link 
-                  to="/login"
-                  className="flex items-center space-x-1 bg-blue-700 px-3 py-1 rounded hover:bg-blue-800"
-                >
-                  <User className="h-4 w-4" />
-                  <span>Login</span>
-                </Link>
-              </div>
+              <Link 
+                to="/admin-login"
+                className="flex items-center space-x-1 bg-blue-700 px-3 py-1 rounded hover:bg-blue-800"
+              >
+                <User className="h-4 w-4" />
+                <span>Admin Login</span>
+              </Link>
             )}
           </div>
         </div>
