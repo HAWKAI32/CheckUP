@@ -1349,6 +1349,7 @@ const AdminDashboard = () => {
             <p className="text-gray-500">No bookings found.</p>
           </div>
         )}
+        </div>
       </div>
     </div>
   );
