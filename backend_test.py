@@ -689,6 +689,226 @@ class ChekUpTester:
         
         return True
 
+    def test_sub_admin_authentication(self):
+        """Test sub-admin user authentication and JWT token validation"""
+        print("\n=== Testing Sub-Admin Authentication ===")
+        
+        # Test sub-admin login with provided credentials
+        sub_admin_login_data = {
+            "email": "subadmin@chekup.com",
+            "password": "SubAdminPass123!"
+        }
+        
+        response = self.make_request("POST", "/auth/login", sub_admin_login_data)
+        if response.status_code == 200:
+            token_data = response.json()
+            self.sub_admin_token = token_data["access_token"]
+            user_data = token_data.get("user", {})
+            
+            # Verify JWT token contains correct sub_admin role
+            if user_data.get("role") == "sub_admin":
+                self.log_result("Sub-Admin Login & Role Verification", True, 
+                              f"Sub-admin logged in successfully with correct role. Token: {self.sub_admin_token[:20]}...")
+            else:
+                self.log_result("Sub-Admin Login & Role Verification", False, 
+                              f"Sub-admin logged in but role is '{user_data.get('role')}', expected 'sub_admin'")
+        else:
+            self.log_result("Sub-Admin Login", False, 
+                          f"Sub-admin login failed. Status: {response.status_code}, Response: {response.text}")
+            return False
+        
+        return True
+
+    def test_sub_admin_booking_access(self):
+        """Test sub-admin booking access and management capabilities"""
+        print("\n=== Testing Sub-Admin Booking Access ===")
+        
+        if not self.sub_admin_token:
+            self.log_result("Sub-Admin Booking Access", False, "No sub-admin token available")
+            return False
+        
+        headers = {"Authorization": f"Bearer {self.sub_admin_token}"}
+        
+        # Test sub-admin can view all bookings (like admin)
+        response = self.make_request("GET", "/bookings", headers=headers)
+        if response.status_code == 200:
+            bookings = response.json()
+            self.log_result("Sub-Admin View All Bookings", True, 
+                          f"Sub-admin can view all bookings ({len(bookings)} bookings)")
+        else:
+            self.log_result("Sub-Admin View All Bookings", False, 
+                          f"Status: {response.status_code}, Response: {response.text}")
+        
+        # Test sub-admin can access individual booking details
+        if self.test_data.get("booking_id"):
+            booking_id = self.test_data["booking_id"]
+            response = self.make_request("GET", f"/bookings/{booking_id}", headers=headers)
+            if response.status_code == 200:
+                booking = response.json()
+                self.log_result("Sub-Admin View Booking Details", True, 
+                              f"Sub-admin can access booking details: {booking.get('booking_number', 'N/A')}")
+            else:
+                self.log_result("Sub-Admin View Booking Details", False, 
+                              f"Status: {response.status_code}, Response: {response.text}")
+        
+        # Test sub-admin can update booking status (coordination tasks)
+        if self.test_data.get("booking_id"):
+            booking_id = self.test_data["booking_id"]
+            status_update = {"status": "sample_collected"}
+            response = self.make_request("PUT", f"/bookings/{booking_id}/status", 
+                                       status_update, headers)
+            if response.status_code == 200:
+                self.log_result("Sub-Admin Update Booking Status", True, 
+                              "Sub-admin can update booking status for coordination")
+            else:
+                self.log_result("Sub-Admin Update Booking Status", False, 
+                              f"Status: {response.status_code}, Response: {response.text}")
+        
+        # Test sub-admin can upload results (file upload capability)
+        if self.test_data.get("booking_id"):
+            booking_id = self.test_data["booking_id"]
+            # Test endpoint accessibility (we expect validation error without actual files)
+            response = self.make_request("POST", f"/bookings/{booking_id}/upload-results", 
+                                       headers=headers)
+            if response.status_code in [422, 400]:  # Validation error expected without files
+                self.log_result("Sub-Admin File Upload Access", True, 
+                              "Sub-admin can access file upload endpoint (validation error expected)")
+            elif response.status_code == 403:
+                self.log_result("Sub-Admin File Upload Access", False, 
+                              "Sub-admin blocked from file upload - should have access")
+            else:
+                self.log_result("Sub-Admin File Upload Access", True, 
+                              f"Sub-admin has file upload access (status: {response.status_code})")
+        
+        return True
+
+    def test_sub_admin_access_restrictions(self):
+        """Test sub-admin access restrictions - should NOT have CRUD privileges"""
+        print("\n=== Testing Sub-Admin Access Restrictions ===")
+        
+        if not self.sub_admin_token:
+            self.log_result("Sub-Admin Access Restrictions", False, "No sub-admin token available")
+            return False
+        
+        headers = {"Authorization": f"Bearer {self.sub_admin_token}"}
+        
+        # Test sub-admin CANNOT create/edit/delete tests (admin-only)
+        test_data = {
+            "name": "Unauthorized Test Creation",
+            "description": "Sub-admin should not be able to create this",
+            "category": "Unauthorized"
+        }
+        
+        response = self.make_request("POST", "/tests", test_data, headers)
+        if response.status_code == 403:
+            self.log_result("Sub-Admin Test Creation Blocked", True, 
+                          "Sub-admin properly blocked from creating tests")
+        else:
+            self.log_result("Sub-Admin Test Creation Blocked", False, 
+                          f"Sub-admin should be blocked from test creation. Status: {response.status_code}")
+        
+        # Test sub-admin CANNOT create/edit/delete clinics (admin-only)
+        clinic_data = {
+            "name": "Unauthorized Clinic",
+            "description": "Sub-admin should not create this",
+            "location": "Test Location",
+            "phone": "+231-000-0000",
+            "email": "test@test.com",
+            "user_id": "test-user-id"
+        }
+        
+        response = self.make_request("POST", "/clinics", clinic_data, headers)
+        if response.status_code == 403:
+            self.log_result("Sub-Admin Clinic Creation Blocked", True, 
+                          "Sub-admin properly blocked from creating clinics")
+        else:
+            self.log_result("Sub-Admin Clinic Creation Blocked", False, 
+                          f"Sub-admin should be blocked from clinic creation. Status: {response.status_code}")
+        
+        # Test sub-admin CANNOT access admin analytics dashboard
+        response = self.make_request("GET", "/analytics/dashboard", headers=headers)
+        if response.status_code == 403:
+            self.log_result("Sub-Admin Analytics Access Blocked", True, 
+                          "Sub-admin properly blocked from analytics dashboard")
+        else:
+            self.log_result("Sub-Admin Analytics Access Blocked", False, 
+                          f"Sub-admin should be blocked from analytics. Status: {response.status_code}")
+        
+        # Test sub-admin CANNOT access surgery inquiry management (admin-only)
+        response = self.make_request("GET", "/surgery-inquiries", headers=headers)
+        if response.status_code == 403:
+            self.log_result("Sub-Admin Surgery Inquiry Access Blocked", True, 
+                          "Sub-admin properly blocked from surgery inquiry management")
+        else:
+            self.log_result("Sub-Admin Surgery Inquiry Access Blocked", False, 
+                          f"Sub-admin should be blocked from surgery inquiries. Status: {response.status_code}")
+        
+        # Test sub-admin CANNOT create test pricing (admin-only)
+        if self.test_data.get("test_id") and self.test_data.get("clinic_id"):
+            pricing_data = {
+                "test_id": self.test_data["test_id"],
+                "clinic_id": self.test_data["clinic_id"],
+                "price_usd": 999.99,
+                "price_lrd": 999999.99,
+                "is_available": True
+            }
+            
+            response = self.make_request("POST", "/test-pricing", pricing_data, headers)
+            if response.status_code == 403:
+                self.log_result("Sub-Admin Pricing Creation Blocked", True, 
+                              "Sub-admin properly blocked from creating test pricing")
+            else:
+                self.log_result("Sub-Admin Pricing Creation Blocked", False, 
+                              f"Sub-admin should be blocked from pricing creation. Status: {response.status_code}")
+        
+        return True
+
+    def test_existing_functionality_integrity(self):
+        """Test that existing admin and clinic functionality still works"""
+        print("\n=== Testing Existing Functionality Integrity ===")
+        
+        # Test admin functionality still works
+        if self.admin_token:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            
+            # Admin should still access analytics
+            response = self.make_request("GET", "/analytics/dashboard", headers=headers)
+            if response.status_code == 200:
+                self.log_result("Admin Analytics Access", True, "Admin can still access analytics dashboard")
+            else:
+                self.log_result("Admin Analytics Access", False, 
+                              f"Admin analytics access broken. Status: {response.status_code}")
+            
+            # Admin should still manage tests
+            response = self.make_request("GET", "/tests", headers=headers)
+            if response.status_code == 200:
+                self.log_result("Admin Test Management", True, "Admin can still manage tests")
+            else:
+                self.log_result("Admin Test Management", False, 
+                              f"Admin test management broken. Status: {response.status_code}")
+        
+        # Test clinic functionality still works
+        if self.clinic_token:
+            headers = {"Authorization": f"Bearer {self.clinic_token}"}
+            
+            # Clinic should still access their bookings
+            response = self.make_request("GET", "/bookings", headers=headers)
+            if response.status_code == 200:
+                self.log_result("Clinic Booking Access", True, "Clinic can still access their bookings")
+            else:
+                self.log_result("Clinic Booking Access", False, 
+                              f"Clinic booking access broken. Status: {response.status_code}")
+        
+        # Test public endpoints still work
+        response = self.make_request("GET", "/public/tests")
+        if response.status_code == 200:
+            self.log_result("Public Endpoints", True, "Public endpoints still functional")
+        else:
+            self.log_result("Public Endpoints", False, 
+                          f"Public endpoints broken. Status: {response.status_code}")
+        
+        return True
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🏥 ChekUp Backend Comprehensive Testing")
