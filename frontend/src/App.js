@@ -1460,7 +1460,7 @@ const AdminDashboard = () => {
           {activeTab === 'surgery' && renderSurgeryInquiries()}
           {activeTab === 'users' && renderUserManagement()}
           {activeTab === 'notifications' && renderNotifications()}
-          {activeTab === 'surgery-hospitals' && renderSurgeryHospitals()}
+          {activeTab === 'hospitals' && renderSurgeryHospitals()}
         </div>
       </div>
     </div>
