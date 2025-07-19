@@ -3141,8 +3141,7 @@ function App() {
           <Header />
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<UserRegistration />} />
+            <Route path="/admin-login" element={<Login />} />
             <Route path="/surgery-inquiry" element={<SurgeryInquiry />} />
             <Route 
               path="/admin/*" 
