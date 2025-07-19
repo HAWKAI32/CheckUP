@@ -1669,7 +1669,6 @@ const AdminDashboard = () => {
         if (type === 'clinic') {
           await axios.delete(`${API}/clinics/${providerId}`);
         }
-        // Also delete associated user account
         fetchClinics();
         alert(`${type} deleted successfully!`);
       } catch (error) {
