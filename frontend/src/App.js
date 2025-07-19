@@ -142,7 +142,17 @@ const Header = () => {
             
             {user ? (
               <div className="flex items-center space-x-2">
-                <span className="hidden md:inline">Welcome, {user.name}</span>
+                <Link
+                  to={getDashboardLink()}
+                  className="hidden md:inline-block bg-blue-700 px-3 py-1 rounded hover:bg-blue-800 text-sm"
+                >
+                  Dashboard
+                </Link>
+                <span className="hidden lg:inline text-sm">
+                  {user.role === 'sub_admin' ? 'Sub-Admin' : 
+                   user.role === 'lab_technician' ? 'Lab Tech' : 
+                   user.role.charAt(0).toUpperCase() + user.role.slice(1)}: {user.name}
+                </span>
                 <button
                   onClick={handleLogout}
                   className="flex items-center space-x-1 bg-blue-700 px-3 py-1 rounded hover:bg-blue-800 text-sm"
