@@ -488,18 +488,18 @@ const Home = () => {
         )}
 
         {/* Surgery Section */}
-        <div className="mt-8 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg shadow-md p-6">
-          <h2 className="text-2xl font-bold mb-4 text-center">Need Surgery in India?</h2>
+        <div className="mt-6 sm:mt-8 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg shadow-md p-4 sm:p-6">
+          <h2 className="text-xl sm:text-2xl font-bold mb-4 text-center">Need Surgery in India?</h2>
           <div className="text-center">
             <img 
               src="https://images.unsplash.com/photo-1585421514738-01798e348b17?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzd8MHwxfHNlYXJjaHwyfHxtZWRpY2FsfGVufDB8fHxibHVlfDE3NTI4ODA5NzB8MA&ixlib=rb-4.1.0&q=85"
               alt="Medical Care"
-              className="mx-auto mb-4 rounded-lg w-48 h-32 object-cover"
+              className="mx-auto mb-4 rounded-lg w-36 sm:w-48 h-24 sm:h-32 object-cover"
             />
-            <p className="mb-4">Get affordable surgery options in India with accommodation assistance</p>
+            <p className="mb-4 text-sm sm:text-base max-w-md mx-auto">Get affordable surgery options in India with accommodation assistance</p>
             <Link 
               to="/surgery-inquiry"
-              className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700"
+              className="inline-block bg-green-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:bg-green-700 text-sm sm:text-base"
             >
               Submit Surgery Inquiry
             </Link>
