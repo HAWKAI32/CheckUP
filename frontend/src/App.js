@@ -710,7 +710,250 @@ const Login = () => {
   );
 };
 
-const AdminDashboard = () => {
+// Sub-Admin Dashboard - Limited functionality
+const SubAdminDashboard = () => {
+  const { user } = useAuth();
+  const [bookings, setBookings] = useState([]);
+  const [clinics, setClinics] = useState([]);
+
+  useEffect(() => {
+    if (user?.role === 'sub_admin') {
+      fetchBookings();
+      fetchClinics();
+    }
+  }, [user]);
+
+  const fetchBookings = async () => {
+    try {
+      const response = await axios.get(`${API}/bookings`);
+      setBookings(response.data);
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+    }
+  };
+
+  const fetchClinics = async () => {
+    try {
+      const response = await axios.get(`${API}/clinics`);
+      setClinics(response.data);
+    } catch (error) {
+      console.error('Error fetching clinics:', error);
+    }
+  };
+
+  const assignBookingToClinic = async (bookingId, clinicId) => {
+    try {
+      await axios.put(`${API}/bookings/${bookingId}/status`, { 
+        status: 'confirmed',
+        clinic_id: clinicId 
+      });
+      fetchBookings();
+      alert('Booking assigned to clinic successfully!');
+    } catch (error) {
+      console.error('Error assigning booking:', error);
+      alert('Error assigning booking');
+    }
+  };
+
+  const sendResultsToPatient = async (bookingId) => {
+    try {
+      // Simulate sending via WhatsApp
+      await axios.put(`${API}/bookings/${bookingId}/status`, { status: 'completed' });
+      fetchBookings();
+      alert('Results sent to patient via WhatsApp!');
+    } catch (error) {
+      console.error('Error sending results:', error);
+      alert('Error sending results');
+    }
+  };
+
+  if (user?.role !== 'sub_admin') {
+    return <Navigate to="/login" />;
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <div className="bg-white shadow">
+        <div className="px-6 py-4">
+          <h1 className="text-2xl font-bold text-gray-800">Sub-Admin Dashboard</h1>
+          <p className="text-sm text-gray-600">Booking Coordinator - {user.name}</p>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 py-8">
+        {/* Booking Statistics */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white p-6 rounded-lg shadow">
+            <div className="flex items-center">
+              <AlertCircle className="h-8 w-8 text-yellow-600 mr-3" />
+              <div>
+                <p className="text-sm font-medium text-gray-600">New Bookings</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {bookings.filter(b => b.status === 'pending').length}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-lg shadow">
+            <div className="flex items-center">
+              <Clock className="h-8 w-8 text-blue-600 mr-3" />
+              <div>
+                <p className="text-sm font-medium text-gray-600">In Progress</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {bookings.filter(b => ['confirmed', 'sample_collected'].includes(b.status)).length}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-lg shadow">
+            <div className="flex items-center">
+              <FileText className="h-8 w-8 text-purple-600 mr-3" />
+              <div>
+                <p className="text-sm font-medium text-gray-600">Results Ready</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {bookings.filter(b => b.status === 'results_ready').length}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-lg shadow">
+            <div className="flex items-center">
+              <CheckCircle className="h-8 w-8 text-green-600 mr-3" />
+              <div>
+                <p className="text-sm font-medium text-gray-600">Completed</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {bookings.filter(b => b.status === 'completed').length}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Booking Management Table */}
+        <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="px-6 py-4 border-b">
+            <h2 className="text-lg font-semibold">Booking Coordination</h2>
+            <p className="text-sm text-gray-600">Assign bookings to clinics and coordinate results delivery</p>
+          </div>
+          
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Booking ID</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Patient</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tests</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Assigned Clinic</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Coordinator Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {bookings.map(booking => {
+                  const clinic = clinics.find(c => c.id === booking.clinic_id);
+                  return (
+                    <tr key={booking.id}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div>
+                          <p className="font-medium text-sm">{booking.booking_number}</p>
+                          <p className="text-xs text-gray-500">
+                            {new Date(booking.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div>
+                          <p className="font-medium">{booking.patient_name}</p>
+                          <p className="text-sm text-gray-500">{booking.patient_phone}</p>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                          {booking.test_ids.length} test(s)
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <p className="font-medium">{clinic?.name || 'Not Assigned'}</p>
+                        {clinic && <p className="text-sm text-gray-500">{clinic.location}</p>}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-block px-2 py-1 rounded text-xs ${
+                          booking.status === 'completed' ? 'bg-green-100 text-green-800' :
+                          booking.status === 'results_ready' ? 'bg-purple-100 text-purple-800' :
+                          booking.status === 'confirmed' ? 'bg-blue-100 text-blue-800' :
+                          booking.status === 'sample_collected' ? 'bg-orange-100 text-orange-800' :
+                          'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {booking.status === 'pending' ? 'NEW' :
+                           booking.status === 'confirmed' ? 'ASSIGNED' :
+                           booking.status === 'sample_collected' ? 'IN PROGRESS' :
+                           booking.status === 'results_ready' ? 'RESULTS READY' :
+                           booking.status === 'completed' ? 'COMPLETED' :
+                           booking.status.toUpperCase()}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="space-y-2">
+                          {booking.status === 'pending' && (
+                            <select 
+                              className="text-xs border rounded px-2 py-1 w-full"
+                              onChange={(e) => {
+                                if (e.target.value) {
+                                  assignBookingToClinic(booking.id, e.target.value);
+                                }
+                              }}
+                            >
+                              <option value="">Assign to Clinic</option>
+                              {clinics.map(clinic => (
+                                <option key={clinic.id} value={clinic.id}>{clinic.name}</option>
+                              ))}
+                            </select>
+                          )}
+
+                          {booking.status === 'results_ready' && (
+                            <button
+                              onClick={() => sendResultsToPatient(booking.id)}
+                              className="text-xs bg-green-600 text-white px-3 py-1 rounded w-full hover:bg-green-700"
+                            >
+                              Send Results via WhatsApp
+                            </button>
+                          )}
+
+                          {['confirmed', 'sample_collected'].includes(booking.status) && (
+                            <div className="text-xs text-gray-500">
+                              Waiting for clinic...
+                            </div>
+                          )}
+
+                          {booking.status === 'completed' && (
+                            <div className="text-xs text-green-600">
+                              ✓ Completed & Sent
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+
+            {bookings.length === 0 && (
+              <div className="text-center py-12">
+                <Calendar className="mx-auto h-12 w-12 text-gray-400" />
+                <h3 className="mt-2 text-sm font-medium text-gray-900">No bookings</h3>
+                <p className="mt-1 text-sm text-gray-500">No patient bookings to coordinate yet.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [analytics, setAnalytics] = useState(null);
