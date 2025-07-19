@@ -1949,12 +1949,14 @@ const ClinicDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [bookings, setBookings] = useState([]);
   const [myClinic, setMyClinic] = useState(null);
+  const [testPricing, setTestPricing] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (user?.role === 'clinic') {
       fetchClinicData();
       fetchBookings();
+      fetchTestPricing();
     }
   }, [user]);
 
@@ -1974,6 +1976,17 @@ const ClinicDashboard = () => {
       setBookings(response.data);
     } catch (error) {
       console.error('Error fetching bookings:', error);
+    }
+  };
+
+  const fetchTestPricing = async () => {
+    try {
+      if (myClinic) {
+        const response = await axios.get(`${API}/public/clinics/${myClinic.id}/tests`);
+        setTestPricing(response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching test pricing:', error);
     }
   };
 
