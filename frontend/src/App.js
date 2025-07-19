@@ -1212,92 +1212,93 @@ const AdminDashboard = () => {
       </div>
       
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Booking ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Patient</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Assigned Clinic</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tests</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Admin Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {bookings.map(booking => {
-              const clinic = clinics.find(c => c.id === booking.clinic_id);
-              return (
-                <tr key={booking.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <p className="font-medium">{booking.booking_number}</p>
-                      <p className="text-xs text-gray-500">
-                        {new Date(booking.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div>
-                      <p className="font-medium">{booking.patient_name}</p>
-                      <p className="text-sm text-gray-500">{booking.patient_phone}</p>
-                      <p className="text-sm text-gray-500">{booking.patient_location}</p>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div>
-                      <p className="font-medium">{clinic?.name || 'Not Assigned'}</p>
-                      {clinic && (
-                        <p className="text-sm text-gray-500">{clinic.location}</p>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
-                      {booking.test_ids.length} test(s)
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-block px-2 py-1 rounded text-xs ${
-                      booking.status === 'completed' ? 'bg-green-100 text-green-800' :
-                      booking.status === 'confirmed' ? 'bg-blue-100 text-blue-800' :
-                      booking.status === 'results_ready' ? 'bg-purple-100 text-purple-800' :
-                      booking.status === 'sample_collected' ? 'bg-orange-100 text-orange-800' :
-                      'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {booking.status === 'pending' ? 'NEW' :
-                       booking.status === 'confirmed' ? 'SCHEDULED' :
-                       booking.status === 'sample_collected' ? 'IN PROGRESS' :
-                       booking.status === 'results_ready' ? 'RESULTS READY' :
-                       booking.status === 'completed' ? 'COMPLETED' :
-                       booking.status.toUpperCase()}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {booking.preferred_currency === 'USD' ? '$' : 'L$'}{booking.total_amount.toFixed(2)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="space-y-2">
-                      <select
-                        value={booking.status}
-                        onChange={async (e) => {
-                          try {
-                            await axios.put(`${API}/bookings/${booking.id}/status`, { status: e.target.value });
-                            fetchBookings();
-                            alert('Booking status updated!');
-                          } catch (error) {
-                            console.error('Error updating status:', error);
-                            alert('Error updating status');
-                          }
-                        }}
-                        className="text-xs border rounded px-2 py-1 w-full"
-                      >
-                        <option value="pending">New</option>
-                        <option value="confirmed">Scheduled</option>
-                        <option value="sample_collected">In Progress</option>
-                        <option value="results_ready">Results Ready</option>
-                        <option value="completed">Completed</option>
-                        <option value="cancelled">Cancelled</option>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Booking ID</th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Patient</th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Assigned Clinic</th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tests</th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden lg:table-cell">Total</th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Admin Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {bookings.map(booking => {
+                const clinic = clinics.find(c => c.id === booking.clinic_id);
+                return (
+                  <tr key={booking.id}>
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
+                      <div>
+                        <p className="font-medium text-sm">{booking.booking_number}</p>
+                        <p className="text-xs text-gray-500">
+                          {new Date(booking.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="px-3 sm:px-6 py-4">
+                      <div>
+                        <p className="font-medium text-sm">{booking.patient_name}</p>
+                        <p className="text-xs text-gray-500">{booking.patient_phone}</p>
+                        <p className="text-xs text-gray-500 sm:hidden">{booking.patient_location}</p>
+                      </div>
+                    </td>
+                    <td className="px-3 sm:px-6 py-4 hidden sm:table-cell">
+                      <div>
+                        <p className="font-medium text-sm">{clinic?.name || 'Not Assigned'}</p>
+                        {clinic && (
+                          <p className="text-xs text-gray-500">{clinic.location}</p>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-3 sm:px-6 py-4">
+                      <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                        {booking.test_ids.length} test(s)
+                      </span>
+                    </td>
+                    <td className="px-3 sm:px-6 py-4">
+                      <span className={`inline-block px-2 py-1 rounded text-xs ${
+                        booking.status === 'completed' ? 'bg-green-100 text-green-800' :
+                        booking.status === 'confirmed' ? 'bg-blue-100 text-blue-800' :
+                        booking.status === 'results_ready' ? 'bg-purple-100 text-purple-800' :
+                        booking.status === 'sample_collected' ? 'bg-orange-100 text-orange-800' :
+                        'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {booking.status === 'pending' ? 'NEW' :
+                         booking.status === 'confirmed' ? 'SCHEDULED' :
+                         booking.status === 'sample_collected' ? 'IN PROGRESS' :
+                         booking.status === 'results_ready' ? 'RESULTS READY' :
+                         booking.status === 'completed' ? 'COMPLETED' :
+                         booking.status.toUpperCase()}
+                      </span>
+                    </td>
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap hidden lg:table-cell">
+                      {booking.preferred_currency === 'USD' ? '$' : 'L$'}{booking.total_amount.toFixed(2)}
+                    </td>
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
+                      <div className="space-y-2">
+                        <select
+                          value={booking.status}
+                          onChange={async (e) => {
+                            try {
+                              await axios.put(`${API}/bookings/${booking.id}/status`, { status: e.target.value });
+                              fetchBookings();
+                              alert('Booking status updated!');
+                            } catch (error) {
+                              console.error('Error updating status:', error);
+                              alert('Error updating status');
+                            }
+                          }}
+                          className="text-xs border rounded px-2 py-1 w-full"
+                        >
+                          <option value="pending">New</option>
+                          <option value="confirmed">Scheduled</option>
+                          <option value="sample_collected">In Progress</option>
+                          <option value="results_ready">Results Ready</option>
+                          <option value="completed">Completed</option>
+                          <option value="cancelled">Cancelled</option>
                       </select>
                       
                       {booking.status === 'pending' && (
