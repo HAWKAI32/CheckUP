@@ -1273,7 +1273,197 @@ const AdminDashboard = () => {
     </div>
   );
 
-  const renderUserManagement = () => (
+  const renderTestManagement = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold">Test Management</h2>
+        <TestForm onSuccess={fetchTests} />
+      </div>
+      
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Test Name</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created Date</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {tests.map(test => (
+              <tr key={test.id}>
+                <td className="px-6 py-4 whitespace-nowrap font-medium">{test.name}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                    {test.category}
+                  </span>
+                </td>
+                <td className="px-6 py-4 max-w-xs truncate">{test.description}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {new Date(test.created_at).toLocaleDateString()}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="flex space-x-2">
+                    <button 
+                      className="text-blue-600 hover:text-blue-800"
+                      onClick={() => handleEditTest(test)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </button>
+                    <button 
+                      className="text-red-600 hover:text-red-800"
+                      onClick={() => handleDeleteTest(test.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        
+        {tests.length === 0 && (
+          <div className="text-center py-12">
+            <TestTube className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No tests</h3>
+            <p className="mt-1 text-sm text-gray-500">Get started by creating a new lab test.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  const renderProviderManagement = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold">Clinic/Hospital & Lab Technician Management</h2>
+        <ProviderForm onSuccess={() => { fetchClinics(); fetchUsers(); }} />
+      </div>
+      
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Provider Name</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Location</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {/* Show Admin */}
+            <tr className="bg-red-50">
+              <td className="px-6 py-4 whitespace-nowrap font-medium">ChekUp Administrator</td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded">Admin</span>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">admin@chekup.com</td>
+              <td className="px-6 py-4 whitespace-nowrap">Monrovia, Liberia</td>
+              <td className="px-6 py-4 whitespace-nowrap">+231-XXX-XXXX</td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Active</span>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <span className="text-gray-400 text-sm">Protected</span>
+              </td>
+            </tr>
+            
+            {/* Show Clinics */}
+            {clinics.map(clinic => (
+              <tr key={clinic.id}>
+                <td className="px-6 py-4 whitespace-nowrap font-medium">{clinic.name}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Clinic</span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">{clinic.email}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{clinic.location}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{clinic.phone}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Active</span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="flex space-x-2">
+                    <button 
+                      className="text-blue-600 hover:text-blue-800"
+                      onClick={() => handleEditProvider(clinic, 'clinic')}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </button>
+                    <button 
+                      className="text-red-600 hover:text-red-800"
+                      onClick={() => handleDeleteProvider(clinic.id, 'clinic')}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        
+        {clinics.length === 0 && (
+          <div className="text-center py-12">
+            <Building className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No healthcare providers</h3>
+            <p className="mt-1 text-sm text-gray-500">Get started by adding a new clinic, hospital, or lab technician.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  const handleEditTest = (test) => {
+    // Implementation for editing test
+    alert(`Edit test: ${test.name} (Feature to be implemented)`);
+  };
+
+  const handleDeleteTest = async (testId) => {
+    if (window.confirm('Are you sure you want to delete this test? This action cannot be undone.')) {
+      try {
+        await axios.delete(`${API}/tests/${testId}`);
+        fetchTests();
+        alert('Test deleted successfully!');
+      } catch (error) {
+        console.error('Error deleting test:', error);
+        alert('Error deleting test');
+      }
+    }
+  };
+
+  const handleEditProvider = (provider, type) => {
+    // Implementation for editing provider
+    alert(`Edit ${type}: ${provider.name} (Feature to be implemented)`);
+  };
+
+  const handleDeleteProvider = async (providerId, type) => {
+    if (window.confirm(`Are you sure you want to delete this ${type}? This will also delete their login account.`)) {
+      try {
+        if (type === 'clinic') {
+          await axios.delete(`${API}/clinics/${providerId}`);
+        }
+        // Also delete associated user account
+        fetchClinics();
+        alert(`${type} deleted successfully!`);
+      } catch (error) {
+        console.error(`Error deleting ${type}:`, error);
+        alert(`Error deleting ${type}`);
+      }
+    }
+  };
+
+  const [users, setUsers] = useState([]);
+
+  const fetchUsers = async () => {
+    // In a real implementation, this would fetch users from an endpoint
+    // For now, we'll use the clinic data
+  };
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Healthcare Provider Management</h2>
