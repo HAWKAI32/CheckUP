@@ -1436,6 +1436,9 @@ const AdminDashboard = () => {
           {activeTab === 'pricing' && renderPricing()}
           {activeTab === 'bookings' && renderBookings()}
           {activeTab === 'surgery' && renderSurgeryInquiries()}
+          {activeTab === 'users' && renderUserManagement()}
+          {activeTab === 'notifications' && renderNotifications()}
+          {activeTab === 'surgery-hospitals' && renderSurgeryHospitals()}
         </div>
       </div>
     </div>
