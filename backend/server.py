@@ -488,7 +488,7 @@ async def get_booking(booking_id: str, current_user: User = Depends(get_current_
         raise HTTPException(status_code=404, detail="Booking not found")
     
     # Check permissions
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role not in [UserRole.ADMIN, UserRole.SUB_ADMIN]:
         clinic = await db.clinics.find_one({"user_id": current_user.id})
         if not clinic or booking["clinic_id"] != clinic["id"]:
             raise HTTPException(status_code=403, detail="Access denied")
