@@ -1196,7 +1196,6 @@ const ClinicForm = ({ onSuccess }) => {
     </div>
   );
 };
-};
 
 const TestForm = ({ onSuccess }) => {
   const [show, setShow] = useState(false);
