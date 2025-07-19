@@ -94,6 +94,22 @@ const Header = () => {
     navigate('/');
   };
 
+  const getDashboardLink = () => {
+    if (!user) return '/admin-login';
+    
+    switch (user.role) {
+      case 'admin':
+        return '/admin';
+      case 'sub_admin':
+        return '/sub-admin';
+      case 'clinic':
+      case 'lab_technician':
+        return '/clinic-dashboard';
+      default:
+        return '/';
+    }
+  };
+
   return (
     <header className="bg-blue-600 text-white shadow-lg">
       <div className="container mx-auto px-4 py-4">
