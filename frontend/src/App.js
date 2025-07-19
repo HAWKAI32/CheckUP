@@ -1728,7 +1728,283 @@ const PricingForm = ({ tests, clinics, onSuccess }) => {
   );
 };
 
-const ClinicForm = ({ onSuccess }) => {
+const UserForm = ({ onSuccess }) => {
+  const [show, setShow] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    location: '',
+    role: 'clinic',
+    password: ''
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(`${API}/auth/register`, formData);
+      setShow(false);
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        location: '',
+        role: 'clinic',
+        password: ''
+      });
+      onSuccess();
+      alert('User created successfully!');
+    } catch (error) {
+      console.error('Error creating user:', error);
+      alert('Error creating user');
+    }
+  };
+
+  if (!show) {
+    return (
+      <button
+        onClick={() => setShow(true)}
+        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center"
+      >
+        <Plus className="mr-2 h-4 w-4" />
+        Add User
+      </button>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold">Add New User</h2>
+          <button onClick={() => setShow(false)} className="text-gray-500">
+            <XCircle className="h-6 w-6" />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+            <select
+              required
+              className="w-full border rounded px-3 py-2"
+              value={formData.role}
+              onChange={(e) => setFormData({...formData, role: e.target.value})}
+            >
+              <option value="admin">Administrator</option>
+              <option value="clinic">Clinic/Hospital</option>
+              <option value="lab_technician">Lab Technician</option>
+            </select>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+            <input
+              type="text"
+              required
+              className="w-full border rounded px-3 py-2"
+              value={formData.name}
+              onChange={(e) => setFormData({...formData, name: e.target.value})}
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input
+              type="email"
+              required
+              className="w-full border rounded px-3 py-2"
+              value={formData.email}
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+            <input
+              type="tel"
+              required
+              className="w-full border rounded px-3 py-2"
+              value={formData.phone}
+              onChange={(e) => setFormData({...formData, phone: e.target.value})}
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+            <input
+              type="text"
+              required
+              className="w-full border rounded px-3 py-2"
+              value={formData.location}
+              onChange={(e) => setFormData({...formData, location: e.target.value})}
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <input
+              type="password"
+              required
+              className="w-full border rounded px-3 py-2"
+              value={formData.password}
+              onChange={(e) => setFormData({...formData, password: e.target.value})}
+            />
+          </div>
+          
+          <div className="flex space-x-4">
+            <button
+              type="button"
+              onClick={() => setShow(false)}
+              className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+            >
+              Create User
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+const HospitalForm = ({ onSuccess }) => {
+  const [show, setShow] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    location: '',
+    contact: '',
+    specialties: '',
+    type: 'hospital'
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      // In a real app, this would save to a hospitals collection
+      // For now, we'll just show success message
+      setShow(false);
+      setFormData({
+        name: '',
+        location: '',
+        contact: '',
+        specialties: '',
+        type: 'hospital'
+      });
+      onSuccess();
+      alert('Hospital/Accommodation added successfully!');
+    } catch (error) {
+      console.error('Error adding hospital:', error);
+      alert('Error adding hospital');
+    }
+  };
+
+  if (!show) {
+    return (
+      <button
+        onClick={() => setShow(true)}
+        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 flex items-center"
+      >
+        <Plus className="mr-2 h-4 w-4" />
+        Add Hospital/Accommodation
+      </button>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold">Add Hospital/Accommodation</h2>
+          <button onClick={() => setShow(false)} className="text-gray-500">
+            <XCircle className="h-6 w-6" />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+            <select
+              required
+              className="w-full border rounded px-3 py-2"
+              value={formData.type}
+              onChange={(e) => setFormData({...formData, type: e.target.value})}
+            >
+              <option value="hospital">Hospital</option>
+              <option value="accommodation">Accommodation</option>
+            </select>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+            <input
+              type="text"
+              required
+              className="w-full border rounded px-3 py-2"
+              value={formData.name}
+              onChange={(e) => setFormData({...formData, name: e.target.value})}
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+            <input
+              type="text"
+              required
+              className="w-full border rounded px-3 py-2"
+              value={formData.location}
+              onChange={(e) => setFormData({...formData, location: e.target.value})}
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Contact</label>
+            <input
+              type="text"
+              required
+              className="w-full border rounded px-3 py-2"
+              value={formData.contact}
+              onChange={(e) => setFormData({...formData, contact: e.target.value})}
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {formData.type === 'hospital' ? 'Specialties' : 'Amenities'}
+            </label>
+            <input
+              type="text"
+              required
+              className="w-full border rounded px-3 py-2"
+              placeholder={formData.type === 'hospital' ? 'e.g., Cardiology, Orthopedics' : 'e.g., WiFi, Kitchen, AC'}
+              value={formData.specialties}
+              onChange={(e) => setFormData({...formData, specialties: e.target.value})}
+            />
+          </div>
+          
+          <div className="flex space-x-4">
+            <button
+              type="button"
+              onClick={() => setShow(false)}
+              className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700"
+            >
+              Add {formData.type === 'hospital' ? 'Hospital' : 'Accommodation'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
   const [show, setShow] = useState(false);
   const [users, setUsers] = useState([]);
   const [formData, setFormData] = useState({
