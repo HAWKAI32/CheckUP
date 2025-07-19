@@ -911,6 +911,52 @@ const AdminDashboard = () => {
     </div>
   );
 
+  const renderClinics = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold">Clinic Management</h2>
+        <ClinicForm onSuccess={fetchClinics} />
+      </div>
+      
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Location</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rating</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {clinics.map(clinic => (
+              <tr key={clinic.id}>
+                <td className="px-6 py-4 whitespace-nowrap font-medium">{clinic.name}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{clinic.location}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{clinic.phone}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="flex items-center">
+                    <Star className="h-4 w-4 text-yellow-400 mr-1" />
+                    <span>{clinic.rating || 0} ({clinic.total_reviews || 0})</span>
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <button className="text-blue-600 hover:text-blue-800 mr-2">
+                    <Edit className="h-4 w-4" />
+                  </button>
+                  <button className="text-red-600 hover:text-red-800">
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="flex">
@@ -975,6 +1021,17 @@ const AdminDashboard = () => {
                 Surgery Inquiries
               </button>
             </div>
+            <div className="px-6 py-2">
+              <button
+                onClick={() => setActiveTab('users')}
+                className={`flex items-center w-full px-2 py-2 text-sm rounded ${
+                  activeTab === 'users' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <Users className="mr-3 h-4 w-4" />
+                User Management
+              </button>
+            </div>
           </nav>
         </div>
 
@@ -982,11 +1039,163 @@ const AdminDashboard = () => {
         <div className="flex-1 p-8">
           {activeTab === 'dashboard' && renderDashboard()}
           {activeTab === 'tests' && renderTests()}
+          {activeTab === 'clinics' && renderClinics()}
           {/* Add other tab renders here */}
         </div>
       </div>
     </div>
   );
+};
+
+const ClinicForm = ({ onSuccess }) => {
+  const [show, setShow] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [formData, setFormData] = useState({
+    user_id: '',
+    name: '',
+    description: '',
+    location: '',
+    phone: '',
+    email: '',
+    services: '',
+    operating_hours: ''
+  });
+
+  useEffect(() => {
+    if (show) {
+      fetchUsers();
+    }
+  }, [show]);
+
+  const fetchUsers = async () => {
+    // Note: This would need a user endpoint in the backend
+    // For now, we'll create a clinic and link it manually
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const clinicData = {
+        ...formData,
+        services: formData.services.split(',').map(s => s.trim()),
+        operating_hours: formData.operating_hours ? JSON.parse(formData.operating_hours) : {}
+      };
+
+      await axios.post(`${API}/clinics`, clinicData);
+      setShow(false);
+      setFormData({
+        user_id: '',
+        name: '',
+        description: '',
+        location: '',
+        phone: '',
+        email: '',
+        services: '',
+        operating_hours: ''
+      });
+      onSuccess();
+    } catch (error) {
+      console.error('Error creating clinic:', error);
+      alert('Error creating clinic');
+    }
+  };
+
+  if (!show) {
+    return (
+      <button
+        onClick={() => setShow(true)}
+        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center"
+      >
+        <Plus className="mr-2 h-4 w-4" />
+        Add Clinic
+      </button>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 max-h-96 overflow-y-auto">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold">Add New Clinic</h2>
+          <button onClick={() => setShow(false)} className="text-gray-500">
+            <XCircle className="h-6 w-6" />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="text"
+            placeholder="User ID (clinic account owner)"
+            required
+            className="w-full border rounded px-3 py-2"
+            value={formData.user_id}
+            onChange={(e) => setFormData({...formData, user_id: e.target.value})}
+          />
+          <input
+            type="text"
+            placeholder="Clinic Name"
+            required
+            className="w-full border rounded px-3 py-2"
+            value={formData.name}
+            onChange={(e) => setFormData({...formData, name: e.target.value})}
+          />
+          <textarea
+            placeholder="Description"
+            required
+            className="w-full border rounded px-3 py-2 h-20"
+            value={formData.description}
+            onChange={(e) => setFormData({...formData, description: e.target.value})}
+          />
+          <input
+            type="text"
+            placeholder="Location"
+            required
+            className="w-full border rounded px-3 py-2"
+            value={formData.location}
+            onChange={(e) => setFormData({...formData, location: e.target.value})}
+          />
+          <input
+            type="tel"
+            placeholder="Phone Number"
+            required
+            className="w-full border rounded px-3 py-2"
+            value={formData.phone}
+            onChange={(e) => setFormData({...formData, phone: e.target.value})}
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            required
+            className="w-full border rounded px-3 py-2"
+            value={formData.email}
+            onChange={(e) => setFormData({...formData, email: e.target.value})}
+          />
+          <input
+            type="text"
+            placeholder="Services (comma separated)"
+            className="w-full border rounded px-3 py-2"
+            value={formData.services}
+            onChange={(e) => setFormData({...formData, services: e.target.value})}
+          />
+          <div className="flex space-x-4">
+            <button
+              type="button"
+              onClick={() => setShow(false)}
+              className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+            >
+              Add Clinic
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
 };
 
 const TestForm = ({ onSuccess }) => {
