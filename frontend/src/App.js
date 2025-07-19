@@ -1660,7 +1660,6 @@ const AdminDashboard = () => {
   };
 
   const handleEditProvider = (provider, type) => {
-    // Implementation for editing provider
     alert(`Edit ${type}: ${provider.name} (Feature to be implemented)`);
   };
 
