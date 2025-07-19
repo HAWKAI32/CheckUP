@@ -1417,7 +1417,7 @@ const AdminDashboard = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Clinic/Hospital & Lab Technician Management</h2>
-        <ProviderForm onSuccess={() => { fetchClinics(); fetchUsers(); }} />
+        <ProviderForm onSuccess={() => { fetchClinics(); }} />
       </div>
       
       <div className="bg-white rounded-lg shadow overflow-hidden">
