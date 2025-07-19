@@ -1521,7 +1521,6 @@ const PricingForm = ({ tests, clinics, onSuccess }) => {
     </div>
   );
 };
-};
 
 const ClinicForm = ({ onSuccess }) => {
   const [show, setShow] = useState(false);
