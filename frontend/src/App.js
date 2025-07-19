@@ -1782,6 +1782,8 @@ const PricingForm = ({ tests, clinics, onSuccess }) => {
     </div>
   );
 };
+
+const ClinicForm = ({ onSuccess }) => {
   const [show, setShow] = useState(false);
   const [users, setUsers] = useState([]);
   const [formData, setFormData] = useState({
