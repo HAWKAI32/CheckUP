@@ -1728,13 +1728,45 @@ const UserForm = ({ onSuccess }) => {
     phone: '',
     location: '',
     role: 'clinic',
-    password: ''
+    password: '',
+    
+    // Clinic/Hospital specific fields
+    description: '',
+    services: '',
+    operating_hours: ''
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API}/auth/register`, formData);
+      // First, create the user account
+      const userData = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        location: formData.location,
+        role: formData.role,
+        password: formData.password
+      };
+
+      const userResponse = await axios.post(`${API}/auth/register`, userData);
+      
+      // If it's a clinic, also create the clinic profile
+      if (formData.role === 'clinic') {
+        const clinicData = {
+          user_id: userResponse.data.id,
+          name: formData.name,
+          description: formData.description || 'Healthcare facility',
+          location: formData.location,
+          phone: formData.phone,
+          email: formData.email,
+          services: formData.services ? formData.services.split(',').map(s => s.trim()) : [],
+          operating_hours: {}
+        };
+        
+        await axios.post(`${API}/clinics`, clinicData);
+      }
+      
       setShow(false);
       setFormData({
         name: '',
@@ -1742,13 +1774,17 @@ const UserForm = ({ onSuccess }) => {
         phone: '',
         location: '',
         role: 'clinic',
-        password: ''
+        password: '',
+        description: '',
+        services: '',
+        operating_hours: ''
       });
+      
       onSuccess();
-      alert('User created successfully!');
+      alert(`${formData.role === 'clinic' ? 'Clinic' : 'Lab Technician'} account created successfully! Login credentials: ${formData.email} / ${formData.password}`);
     } catch (error) {
-      console.error('Error creating user:', error);
-      alert('Error creating user');
+      console.error('Error creating account:', error);
+      alert('Error creating account. Please check if email already exists.');
     }
   };
 
@@ -1759,37 +1795,38 @@ const UserForm = ({ onSuccess }) => {
         className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center"
       >
         <Plus className="mr-2 h-4 w-4" />
-        Add User
+        Create Healthcare Provider Account
       </button>
     );
   }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+      <div className="bg-white rounded-lg p-6 max-w-lg w-full mx-4 max-h-96 overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold">Add New User</h2>
+          <h2 className="text-xl font-bold">Create Healthcare Provider Account</h2>
           <button onClick={() => setShow(false)} className="text-gray-500">
             <XCircle className="h-6 w-6" />
           </button>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Provider Type</label>
             <select
               required
               className="w-full border rounded px-3 py-2"
               value={formData.role}
               onChange={(e) => setFormData({...formData, role: e.target.value})}
             >
-              <option value="admin">Administrator</option>
               <option value="clinic">Clinic/Hospital</option>
               <option value="lab_technician">Lab Technician</option>
             </select>
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {formData.role === 'clinic' ? 'Clinic/Hospital Name' : 'Technician Name'}
+            </label>
             <input
               type="text"
               required
@@ -1799,26 +1836,28 @@ const UserForm = ({ onSuccess }) => {
             />
           </div>
           
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              type="email"
-              required
-              className="w-full border rounded px-3 py-2"
-              value={formData.email}
-              onChange={(e) => setFormData({...formData, email: e.target.value})}
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-            <input
-              type="tel"
-              required
-              className="w-full border rounded px-3 py-2"
-              value={formData.phone}
-              onChange={(e) => setFormData({...formData, phone: e.target.value})}
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input
+                type="email"
+                required
+                className="w-full border rounded px-3 py-2"
+                value={formData.email}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+              <input
+                type="tel"
+                required
+                className="w-full border rounded px-3 py-2"
+                value={formData.phone}
+                onChange={(e) => setFormData({...formData, phone: e.target.value})}
+              />
+            </div>
           </div>
           
           <div>
@@ -1826,6 +1865,7 @@ const UserForm = ({ onSuccess }) => {
             <input
               type="text"
               required
+              placeholder="City, District, Liberia"
               className="w-full border rounded px-3 py-2"
               value={formData.location}
               onChange={(e) => setFormData({...formData, location: e.target.value})}
@@ -1833,7 +1873,7 @@ const UserForm = ({ onSuccess }) => {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Login Password</label>
             <input
               type="password"
               required
@@ -1842,8 +1882,33 @@ const UserForm = ({ onSuccess }) => {
               onChange={(e) => setFormData({...formData, password: e.target.value})}
             />
           </div>
+
+          {formData.role === 'clinic' && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea
+                  className="w-full border rounded px-3 py-2 h-16"
+                  placeholder="Brief description of services offered"
+                  value={formData.description}
+                  onChange={(e) => setFormData({...formData, description: e.target.value})}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Services (Optional)</label>
+                <input
+                  type="text"
+                  className="w-full border rounded px-3 py-2"
+                  placeholder="e.g., General Practice, Laboratory, X-Ray"
+                  value={formData.services}
+                  onChange={(e) => setFormData({...formData, services: e.target.value})}
+                />
+              </div>
+            </>
+          )}
           
-          <div className="flex space-x-4">
+          <div className="flex space-x-4 pt-4">
             <button
               type="button"
               onClick={() => setShow(false)}
@@ -1855,7 +1920,7 @@ const UserForm = ({ onSuccess }) => {
               type="submit"
               className="flex-1 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
             >
-              Create User
+              Create Account & Portal
             </button>
           </div>
         </form>
