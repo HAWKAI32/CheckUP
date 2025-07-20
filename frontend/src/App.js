@@ -2985,21 +2985,16 @@ const SurgeryInquiry = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Budget Range *
+                Your Budget (USD) *
               </label>
-              <select
+              <input
+                type="text"
                 required
+                placeholder="Enter your budget amount (e.g., $15,000)"
                 className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={formData.budget_range}
                 onChange={(e) => setFormData({...formData, budget_range: e.target.value})}
-              >
-                <option value="">Select Budget Range</option>
-                <option value="Under $5,000">Under $5,000</option>
-                <option value="$5,000 - $10,000">$5,000 - $10,000</option>
-                <option value="$10,000 - $20,000">$10,000 - $20,000</option>
-                <option value="$20,000 - $50,000">$20,000 - $50,000</option>
-                <option value="Above $50,000">Above $50,000</option>
-              </select>
+              />
             </div>
 
             <div>
