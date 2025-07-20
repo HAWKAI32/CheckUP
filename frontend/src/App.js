@@ -1113,7 +1113,7 @@ const AdminDashboard = () => {
   };
 
   if (user?.role !== 'admin') {
-    return <Navigate to="/login" />;
+    return <Navigate to="/admin-login" />;
   }
 
   const renderTests = () => (
