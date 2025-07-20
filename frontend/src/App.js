@@ -883,7 +883,7 @@ const SubAdminDashboard = () => {
   };
 
   if (user?.role !== 'sub_admin') {
-    return <Navigate to="/login" />;
+    return <Navigate to="/admin-login" />;
   }
 
   return (
