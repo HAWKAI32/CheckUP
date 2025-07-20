@@ -735,20 +735,40 @@ const Login = () => {
     setLoading(true);
 
     try {
+      console.log('Attempting login with:', { email: formData.email, role: 'unknown' });
       const response = await axios.post(`${API}/auth/login`, formData);
+      
+      console.log('Login response received:', {
+        status: response.status,
+        user: response.data.user,
+        hasToken: !!response.data.access_token
+      });
+      
+      // Call auth context login
       login(response.data.user, response.data.access_token);
+      
+      console.log('Auth context updated, navigating based on role:', response.data.user.role);
       
       // Redirect based on user role
       if (response.data.user.role === 'admin') {
+        console.log('Navigating to admin dashboard');
         navigate('/admin');
       } else if (response.data.user.role === 'sub_admin') {
+        console.log('Navigating to sub-admin dashboard');
         navigate('/sub-admin');
       } else {
+        console.log('Navigating to clinic dashboard');
         navigate('/clinic-dashboard');
       }
     } catch (error) {
       console.error('Login error:', error);
-      alert('Invalid email or password');
+      if (error.response?.status === 401) {
+        alert('Invalid email or password');
+      } else if (error.response?.status === 404) {
+        alert('User not found');
+      } else {
+        alert('Login failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
