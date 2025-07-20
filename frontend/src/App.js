@@ -1076,6 +1076,8 @@ const AdminDashboard = () => {
   const [tests, setTests] = useState([]);
   const [clinics, setClinics] = useState([]);
   const [bookings, setBookings] = useState([]);
+  const [subAdmins, setSubAdmins] = useState([]);
+  const [surgeryInquiries, setSurgeryInquiries] = useState([]);
   
   useEffect(() => {
     if (user?.role !== 'admin') return;
@@ -1083,6 +1085,8 @@ const AdminDashboard = () => {
     fetchTests();
     fetchClinics();
     fetchBookings();
+    fetchSubAdmins();
+    fetchSurgeryInquiries();
   }, [user]);
 
   const fetchTests = async () => {
