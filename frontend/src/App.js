@@ -747,6 +747,9 @@ const Login = () => {
       // Call auth context login
       login(response.data.user, response.data.access_token);
       
+      // Small delay to ensure context is updated
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       console.log('Auth context updated, navigating based on role:', response.data.user.role);
       
       // Redirect based on user role
