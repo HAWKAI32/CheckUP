@@ -1116,6 +1116,26 @@ const AdminDashboard = () => {
     }
   };
 
+  const fetchSubAdmins = async () => {
+    try {
+      // Get all users with sub_admin role
+      const response = await axios.get(`${API}/users`);
+      const subAdminUsers = response.data.filter(u => u.role === 'sub_admin');
+      setSubAdmins(subAdminUsers);
+    } catch (error) {
+      console.error('Error fetching sub-admins:', error);
+    }
+  };
+
+  const fetchSurgeryInquiries = async () => {
+    try {
+      const response = await axios.get(`${API}/surgery-inquiries`);
+      setSurgeryInquiries(response.data);
+    } catch (error) {
+      console.error('Error fetching surgery inquiries:', error);
+    }
+  };
+
   if (user?.role !== 'admin') {
     return <Navigate to="/admin-login" />;
   }
