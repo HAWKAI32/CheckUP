@@ -741,6 +741,8 @@ const Login = () => {
       // Redirect based on user role
       if (response.data.user.role === 'admin') {
         navigate('/admin');
+      } else if (response.data.user.role === 'sub_admin') {
+        navigate('/sub-admin');
       } else {
         navigate('/clinic-dashboard');
       }
