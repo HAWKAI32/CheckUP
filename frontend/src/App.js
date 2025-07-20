@@ -3748,7 +3748,7 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   const { user } = useAuth();
   
   if (!user) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/admin-login" />;
   }
   
   if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
