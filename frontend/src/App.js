@@ -3128,7 +3128,7 @@ const ClinicDashboard = () => {
   };
 
   if (user?.role !== 'clinic') {
-    return <Navigate to="/login" />;
+    return <Navigate to="/admin-login" />;
   }
 
   const renderDashboard = () => (
