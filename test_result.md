@@ -342,6 +342,7 @@ test_plan:
   stuck_tasks: []
   test_all: false
   test_priority: "completed"
+  admin_management_features_tested: true
 
   - task: "Make ChekUp platform fully responsive"
     implemented: true
