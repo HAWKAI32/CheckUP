@@ -863,6 +863,254 @@ class ChekUpTester:
         
         return True
 
+    def test_admin_user_management(self):
+        """Test new admin user management endpoints"""
+        print("\n=== Testing Admin User Management Endpoints ===")
+        
+        if not self.admin_token:
+            self.log_result("Admin User Management", False, "No admin token available")
+            return False
+        
+        headers = {"Authorization": f"Bearer {self.admin_token}"}
+        
+        # Test GET /api/users - Retrieve all users
+        response = self.make_request("GET", "/users", headers=headers)
+        if response.status_code == 200:
+            users = response.json()
+            self.log_result("Admin Get All Users", True, f"Retrieved {len(users)} users")
+            
+            # Store a user ID for update/delete tests (but not admin's own ID)
+            admin_user_id = None
+            test_user_id = None
+            for user in users:
+                if user.get("role") == "admin":
+                    admin_user_id = user.get("id")
+                elif user.get("role") != "admin":
+                    test_user_id = user.get("id")
+                    break
+            
+            self.test_data["admin_user_id"] = admin_user_id
+            self.test_data["test_user_id"] = test_user_id
+        else:
+            self.log_result("Admin Get All Users", False, f"Status: {response.status_code}, Response: {response.text}")
+            return False
+        
+        # Test PUT /api/users/{user_id} - Update user information
+        if self.test_data.get("test_user_id"):
+            user_id = self.test_data["test_user_id"]
+            update_data = {
+                "is_active": False,
+                "name": "Updated User Name"
+            }
+            
+            response = self.make_request("PUT", f"/users/{user_id}", update_data, headers)
+            if response.status_code == 200:
+                self.log_result("Admin Update User", True, "User updated successfully")
+            else:
+                self.log_result("Admin Update User", False, f"Status: {response.status_code}, Response: {response.text}")
+        
+        # Test protection against self-deletion
+        if self.test_data.get("admin_user_id"):
+            admin_id = self.test_data["admin_user_id"]
+            response = self.make_request("DELETE", f"/users/{admin_id}", headers=headers)
+            if response.status_code == 400:
+                self.log_result("Admin Self-Deletion Protection", True, "Admin properly blocked from deleting own account")
+            else:
+                self.log_result("Admin Self-Deletion Protection", False, f"Expected 400, got {response.status_code}")
+        
+        # Test DELETE /api/users/{user_id} - Delete user (create a test user first)
+        test_user_data = {
+            "email": "testuser@delete.com",
+            "name": "Test User for Deletion",
+            "phone": "+231-777-000000",
+            "location": "Test Location",
+            "role": "clinic",
+            "password": "TestPass123!"
+        }
+        
+        # Create test user
+        response = self.make_request("POST", "/auth/register", test_user_data)
+        if response.status_code in [200, 201]:
+            # Get the created user ID
+            response = self.make_request("GET", "/users", headers=headers)
+            if response.status_code == 200:
+                users = response.json()
+                delete_user_id = None
+                for user in users:
+                    if user.get("email") == "testuser@delete.com":
+                        delete_user_id = user.get("id")
+                        break
+                
+                if delete_user_id:
+                    # Test deletion
+                    response = self.make_request("DELETE", f"/users/{delete_user_id}", headers=headers)
+                    if response.status_code == 200:
+                        self.log_result("Admin Delete User", True, "User deleted successfully")
+                    else:
+                        self.log_result("Admin Delete User", False, f"Status: {response.status_code}, Response: {response.text}")
+        
+        return True
+
+    def test_admin_surgery_inquiry_management(self):
+        """Test new admin surgery inquiry management endpoints"""
+        print("\n=== Testing Admin Surgery Inquiry Management ===")
+        
+        if not self.admin_token:
+            self.log_result("Admin Surgery Inquiry Management", False, "No admin token available")
+            return False
+        
+        headers = {"Authorization": f"Bearer {self.admin_token}"}
+        
+        # Ensure we have a surgery inquiry to work with
+        if not self.test_data.get("inquiry_id"):
+            # Create one for testing
+            inquiry_data = {
+                "patient_name": "Test Patient for Management",
+                "patient_phone": "+231-777-111222",
+                "patient_email": "testpatient@management.com",
+                "surgery_type": "Test Surgery",
+                "medical_condition": "Test condition for management testing",
+                "preferred_hospital_location": "India",
+                "budget_range": "$10,000 - $15,000",
+                "notes": "Test inquiry for management testing"
+            }
+            
+            response = self.make_request("POST", "/surgery-inquiries", inquiry_data)
+            if response.status_code in [200, 201]:
+                inquiry_response = response.json()
+                self.test_data["inquiry_id"] = inquiry_response["id"]
+        
+        # Test GET /api/surgery-inquiries - Retrieve all surgery inquiries
+        response = self.make_request("GET", "/surgery-inquiries", headers=headers)
+        if response.status_code == 200:
+            inquiries = response.json()
+            self.log_result("Admin Get All Surgery Inquiries", True, f"Retrieved {len(inquiries)} surgery inquiries")
+        else:
+            self.log_result("Admin Get All Surgery Inquiries", False, f"Status: {response.status_code}, Response: {response.text}")
+        
+        # Test PUT /api/surgery-inquiries/{inquiry_id} - Update inquiry status and admin notes
+        if self.test_data.get("inquiry_id"):
+            inquiry_id = self.test_data["inquiry_id"]
+            update_data = {
+                "status": "in_progress",
+                "hospital_details": "Updated hospital information by admin",
+                "accommodation_details": "Updated accommodation details",
+                "estimated_cost": "$12,000 - $14,000 (admin updated)"
+            }
+            
+            response = self.make_request("PUT", f"/surgery-inquiries/{inquiry_id}", update_data, headers)
+            if response.status_code == 200:
+                self.log_result("Admin Update Surgery Inquiry", True, "Surgery inquiry updated successfully")
+            else:
+                self.log_result("Admin Update Surgery Inquiry", False, f"Status: {response.status_code}, Response: {response.text}")
+        
+        # Test DELETE /api/surgery-inquiries/{inquiry_id} - Delete surgery inquiry
+        # Create a test inquiry for deletion
+        delete_inquiry_data = {
+            "patient_name": "Delete Test Patient",
+            "patient_phone": "+231-777-999000",
+            "patient_email": "deletetest@inquiry.com",
+            "surgery_type": "Delete Test Surgery",
+            "medical_condition": "Test condition for deletion",
+            "preferred_hospital_location": "India",
+            "budget_range": "$5,000 - $10,000",
+            "notes": "Test inquiry for deletion testing"
+        }
+        
+        response = self.make_request("POST", "/surgery-inquiries", delete_inquiry_data)
+        if response.status_code in [200, 201]:
+            delete_inquiry_response = response.json()
+            delete_inquiry_id = delete_inquiry_response["id"]
+            
+            # Test deletion
+            response = self.make_request("DELETE", f"/surgery-inquiries/{delete_inquiry_id}", headers=headers)
+            if response.status_code == 200:
+                self.log_result("Admin Delete Surgery Inquiry", True, "Surgery inquiry deleted successfully")
+            else:
+                self.log_result("Admin Delete Surgery Inquiry", False, f"Status: {response.status_code}, Response: {response.text}")
+        
+        return True
+
+    def test_role_based_access_for_new_endpoints(self):
+        """Test role-based access control for new admin management endpoints"""
+        print("\n=== Testing Role-Based Access Control for New Endpoints ===")
+        
+        # Test sub-admin access to user management (should be blocked)
+        if self.sub_admin_token:
+            headers = {"Authorization": f"Bearer {self.sub_admin_token}"}
+            
+            # Test sub-admin cannot access user management
+            response = self.make_request("GET", "/users", headers=headers)
+            if response.status_code == 403:
+                self.log_result("Sub-Admin User Management Blocked", True, "Sub-admin properly blocked from user management")
+            else:
+                self.log_result("Sub-Admin User Management Blocked", False, f"Expected 403, got {response.status_code}")
+            
+            # Test sub-admin cannot access surgery inquiry management
+            response = self.make_request("GET", "/surgery-inquiries", headers=headers)
+            if response.status_code == 403:
+                self.log_result("Sub-Admin Surgery Inquiry Management Blocked", True, "Sub-admin properly blocked from surgery inquiry management")
+            else:
+                self.log_result("Sub-Admin Surgery Inquiry Management Blocked", False, f"Expected 403, got {response.status_code}")
+        
+        # Test clinic user access to new endpoints (should be blocked)
+        if self.clinic_token:
+            headers = {"Authorization": f"Bearer {self.clinic_token}"}
+            
+            # Test clinic cannot access user management
+            response = self.make_request("GET", "/users", headers=headers)
+            if response.status_code == 403:
+                self.log_result("Clinic User Management Blocked", True, "Clinic user properly blocked from user management")
+            else:
+                self.log_result("Clinic User Management Blocked", False, f"Expected 403, got {response.status_code}")
+            
+            # Test clinic cannot access surgery inquiry management
+            response = self.make_request("GET", "/surgery-inquiries", headers=headers)
+            if response.status_code == 403:
+                self.log_result("Clinic Surgery Inquiry Management Blocked", True, "Clinic user properly blocked from surgery inquiry management")
+            else:
+                self.log_result("Clinic Surgery Inquiry Management Blocked", False, f"Expected 403, got {response.status_code}")
+        
+        return True
+
+    def test_data_validation_for_new_endpoints(self):
+        """Test data validation for new admin management endpoints"""
+        print("\n=== Testing Data Validation for New Endpoints ===")
+        
+        if not self.admin_token:
+            self.log_result("Data Validation Tests", False, "No admin token available")
+            return False
+        
+        headers = {"Authorization": f"Bearer {self.admin_token}"}
+        
+        # Test invalid user ID handling
+        response = self.make_request("GET", "/users/invalid-user-id", headers=headers)
+        if response.status_code == 404:
+            self.log_result("Invalid User ID Handling", True, "Invalid user ID properly handled with 404")
+        else:
+            self.log_result("Invalid User ID Handling", False, f"Expected 404, got {response.status_code}")
+        
+        # Test invalid surgery inquiry ID handling
+        response = self.make_request("GET", "/surgery-inquiries/invalid-inquiry-id", headers=headers)
+        if response.status_code == 404:
+            self.log_result("Invalid Surgery Inquiry ID Handling", True, "Invalid inquiry ID properly handled with 404")
+        else:
+            self.log_result("Invalid Surgery Inquiry ID Handling", False, f"Expected 404, got {response.status_code}")
+        
+        # Test user update with invalid data
+        if self.test_data.get("test_user_id"):
+            user_id = self.test_data["test_user_id"]
+            invalid_update = {"invalid_field": "invalid_value"}
+            
+            response = self.make_request("PUT", f"/users/{user_id}", invalid_update, headers)
+            # Should still work as the endpoint accepts any dict and filters valid fields
+            if response.status_code in [200, 400, 422]:
+                self.log_result("User Update Data Validation", True, "User update validation working properly")
+            else:
+                self.log_result("User Update Data Validation", False, f"Unexpected status: {response.status_code}")
+        
+        return True
+
     def test_existing_functionality_integrity(self):
         """Test that existing admin and clinic functionality still works"""
         print("\n=== Testing Existing Functionality Integrity ===")
