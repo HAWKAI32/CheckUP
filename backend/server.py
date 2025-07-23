@@ -756,6 +756,58 @@ async def get_public_test_pricing(test_id: str):
 async def get_public_clinic_tests(clinic_id: str):
     return await get_clinic_tests(clinic_id)
 
+# User Management endpoints (Admin only)
+@api_router.get("/users", response_model=List[User])
+async def get_all_users(current_user: User = Depends(get_admin_user)):
+    users = await db.users.find().to_list(1000)
+    return [User(**user) for user in users]
+
+@api_router.put("/users/{user_id}")
+async def update_user(user_id: str, update_data: dict, current_user: User = Depends(get_admin_user)):
+    update_data['updated_at'] = datetime.utcnow()
+    
+    result = await db.users.update_one({"id": user_id}, {"$set": update_data})
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"message": "User updated successfully"}
+
+@api_router.delete("/users/{user_id}")
+async def delete_user(user_id: str, current_user: User = Depends(get_admin_user)):
+    # Don't allow deletion of current admin
+    if user_id == current_user.id:
+        raise HTTPException(status_code=400, detail="Cannot delete your own account")
+    
+    result = await db.users.delete_one({"id": user_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"message": "User deleted successfully"}
+
+# Surgery Inquiry Management endpoints
+@api_router.get("/surgery-inquiries", response_model=List[SurgeryInquiry])
+async def get_surgery_inquiries(current_user: User = Depends(get_admin_user)):
+    inquiries = await db.surgery_inquiries.find().to_list(1000)
+    return [SurgeryInquiry(**inquiry) for inquiry in inquiries]
+
+@api_router.put("/surgery-inquiries/{inquiry_id}")
+async def update_surgery_inquiry(inquiry_id: str, update_data: dict, current_user: User = Depends(get_admin_user)):
+    update_data['updated_at'] = datetime.utcnow()
+    
+    result = await db.surgery_inquiries.update_one({"id": inquiry_id}, {"$set": update_data})
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Surgery inquiry not found")
+    
+    return {"message": "Surgery inquiry updated successfully"}
+
+@api_router.delete("/surgery-inquiries/{inquiry_id}")
+async def delete_surgery_inquiry(inquiry_id: str, current_user: User = Depends(get_admin_user)):
+    result = await db.surgery_inquiries.delete_one({"id": inquiry_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Surgery inquiry not found")
+    
+    return {"message": "Surgery inquiry deleted successfully"}
+
 # Include the router in the main app
 app.include_router(api_router)
 
