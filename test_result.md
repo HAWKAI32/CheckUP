@@ -195,6 +195,51 @@ backend:
         agent: "testing"
         comment: "ANALYTICS DASHBOARD WORKING! Revenue tracking, booking statistics, comprehensive dashboard data aggregation all functional."
 
+  - task: "Admin user management endpoints"
+    implemented: true
+    working: true  # TESTED
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "NEW FEATURE: Admin-only user management endpoints - GET /api/users (retrieve all users), PUT /api/users/{user_id} (update user info), DELETE /api/users/{user_id} (delete users with self-deletion protection)."
+      - working: true
+        agent: "testing"
+        comment: "ADMIN USER MANAGEMENT FULLY WORKING! ✅ GET /api/users retrieves all users successfully, ✅ PUT /api/users/{user_id} updates user information correctly, ✅ DELETE /api/users/{user_id} deletes users with proper self-deletion protection (admin cannot delete own account), ✅ Role-based access control working - only admin users can access these endpoints, ✅ Sub-admin and clinic users properly blocked with 403 responses. All user management functionality working perfectly."
+
+  - task: "Admin surgery inquiry management endpoints"
+    implemented: true
+    working: true  # TESTED
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "NEW FEATURE: Admin-only surgery inquiry management endpoints - GET /api/surgery-inquiries (retrieve all inquiries), PUT /api/surgery-inquiries/{inquiry_id} (update status/admin notes), DELETE /api/surgery-inquiries/{inquiry_id} (delete inquiries)."
+      - working: true
+        agent: "testing"
+        comment: "ADMIN SURGERY INQUIRY MANAGEMENT FULLY WORKING! ✅ GET /api/surgery-inquiries retrieves all surgery inquiries successfully, ✅ PUT /api/surgery-inquiries/{inquiry_id} updates inquiry status and admin notes correctly, ✅ DELETE /api/surgery-inquiries/{inquiry_id} deletes surgery inquiries successfully, ✅ Role-based access control working perfectly - only admin users can access these endpoints, ✅ Sub-admin and clinic users properly blocked with 403 responses. All surgery inquiry management functionality working perfectly."
+
+  - task: "Role-based access control for new admin features"
+    implemented: true
+    working: true  # TESTED
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "NEW FEATURE: Enhanced role-based access control ensuring only admin users can access new user management and surgery inquiry management endpoints."
+      - working: true
+        agent: "testing"
+        comment: "ROLE-BASED ACCESS CONTROL FOR NEW FEATURES WORKING PERFECTLY! ✅ Admin users have full access to user management endpoints, ✅ Admin users have full access to surgery inquiry management endpoints, ✅ Sub-admin users properly blocked from user management (403 response), ✅ Sub-admin users properly blocked from surgery inquiry management (403 response), ✅ Clinic users properly blocked from user management (403 response), ✅ Clinic users properly blocked from surgery inquiry management (403 response). Security implementation is excellent - all unauthorized access attempts properly rejected."
+
 frontend:
   - task: "Complete React frontend with all features"
     implemented: true
