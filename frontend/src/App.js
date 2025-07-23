@@ -2679,6 +2679,115 @@ const PricingForm = ({ tests, clinics, onSuccess }) => {
   );
 };
 
+const SurgeryInquiryManager = ({ inquiry, onUpdate }) => {
+  const [show, setShow] = useState(false);
+  const [status, setStatus] = useState(inquiry.status);
+  const [notes, setNotes] = useState(inquiry.admin_notes || '');
+
+  const handleStatusUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.put(`${API}/surgery-inquiries/${inquiry.id}`, {
+        status: status,
+        admin_notes: notes
+      });
+      setShow(false);
+      onUpdate();
+      alert('Surgery inquiry updated successfully!');
+    } catch (error) {
+      console.error('Error updating surgery inquiry:', error);
+      alert('Error updating surgery inquiry');
+    }
+  };
+
+  if (!show) {
+    return (
+      <button
+        onClick={() => setShow(true)}
+        className="text-blue-600 hover:text-blue-800 text-sm"
+      >
+        Manage
+      </button>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-lg mx-auto max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg sm:text-xl font-bold">Manage Surgery Inquiry</h2>
+          <button onClick={() => setShow(false)} className="text-gray-500 hover:text-gray-700 p-1">
+            <XCircle className="h-5 w-5 sm:h-6 sm:w-6" />
+          </button>
+        </div>
+
+        <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+          <h3 className="font-semibold mb-2">Patient Information</h3>
+          <div className="text-sm space-y-1">
+            <p><strong>Name:</strong> {inquiry.patient_name}</p>
+            <p><strong>Email:</strong> {inquiry.patient_email}</p>
+            <p><strong>Phone:</strong> {inquiry.patient_phone}</p>
+            <p><strong>Age:</strong> {inquiry.patient_age}</p>
+            <p><strong>Gender:</strong> {inquiry.patient_gender}</p>
+            <p><strong>Surgery Type:</strong> {inquiry.surgery_type}</p>
+            <p><strong>Budget:</strong> {inquiry.budget_range}</p>
+            <p><strong>Medical History:</strong> {inquiry.medical_history}</p>
+            {inquiry.accommodation_needed && (
+              <p><strong>Accommodation:</strong> Required</p>
+            )}
+          </div>
+        </div>
+
+        <form onSubmit={handleStatusUpdate} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Status
+            </label>
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="new">New</option>
+              <option value="in_progress">In Progress</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Admin Notes
+            </label>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Add notes about this inquiry..."
+              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              rows={4}
+            />
+          </div>
+
+          <div className="flex space-x-2">
+            <button
+              type="button"
+              onClick={() => setShow(false)}
+              className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-400"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+            >
+              Update
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 const ProviderForm = ({ onSuccess }) => {
   const [show, setShow] = useState(false);
   const [formData, setFormData] = useState({
