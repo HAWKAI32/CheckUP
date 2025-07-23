@@ -1136,6 +1136,43 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleSubAdminStatusUpdate = async (subAdminId, newStatus) => {
+    try {
+      await axios.put(`${API}/users/${subAdminId}`, { is_active: newStatus });
+      fetchSubAdmins();
+      alert(`Sub-admin ${newStatus ? 'activated' : 'deactivated'} successfully!`);
+    } catch (error) {
+      console.error('Error updating sub-admin status:', error);
+      alert('Error updating sub-admin status');
+    }
+  };
+
+  const handleSubAdminDelete = async (subAdminId) => {
+    if (window.confirm('Are you sure you want to delete this sub-admin? This action cannot be undone.')) {
+      try {
+        await axios.delete(`${API}/users/${subAdminId}`);
+        fetchSubAdmins();
+        alert('Sub-admin deleted successfully!');
+      } catch (error) {
+        console.error('Error deleting sub-admin:', error);
+        alert('Error deleting sub-admin');
+      }
+    }
+  };
+
+  const handleSurgeryInquiryDelete = async (inquiryId) => {
+    if (window.confirm('Are you sure you want to delete this surgery inquiry? This action cannot be undone.')) {
+      try {
+        await axios.delete(`${API}/surgery-inquiries/${inquiryId}`);
+        fetchSurgeryInquiries();
+        alert('Surgery inquiry deleted successfully!');
+      } catch (error) {
+        console.error('Error deleting surgery inquiry:', error);
+        alert('Error deleting surgery inquiry');
+      }
+    }
+  };
+
   if (user?.role !== 'admin') {
     return <Navigate to="/admin-login" />;
   }
