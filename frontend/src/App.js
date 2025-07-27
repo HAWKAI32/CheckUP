@@ -5304,6 +5304,160 @@ const TestProviders = () => {
   );
 };
 
+const CartBookingForm = ({ cartItems, currency, total, onClose, onSuccess }) => {
+  const [formData, setFormData] = useState({
+    patient_name: '',
+    patient_phone: '',
+    patient_location: '',
+    delivery_method: 'whatsapp',
+    delivery_charge: 0
+  });
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // Create individual bookings for each cart item
+      const bookingPromises = cartItems.map(async (item) => {
+        const bookingData = {
+          patient_name: formData.patient_name,
+          patient_phone: formData.patient_phone,
+          patient_location: formData.patient_location,
+          test_ids: [item.test.id],
+          clinic_id: item.provider.id,
+          preferred_currency: currency.toUpperCase(),
+          total_amount: currency === 'USD' ? item.pricing.price_usd : item.pricing.price_lrd,
+          delivery_method: formData.delivery_method,
+          notes: `Booked via cart - Test: ${item.test.name}, Provider: ${item.provider.name}`
+        };
+
+        return axios.post(`${API}/bookings`, bookingData);
+      });
+
+      await Promise.all(bookingPromises);
+      
+      alert(`Successfully booked ${cartItems.length} test(s)!\n\nBooking Details:\n- Total Amount: ${currency === 'USD' ? '$' : 'L$'}${total}\n- Tests: ${cartItems.map(item => item.test.name).join(', ')}\n\nYou will be contacted shortly for sample collection.`);
+      
+      onSuccess();
+    } catch (error) {
+      console.error('Error creating booking:', error);
+      alert('Error creating booking. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md mx-auto max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg sm:text-xl font-bold">Complete Your Booking</h2>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 p-1">
+            <XCircle className="h-5 w-5 sm:h-6 sm:w-6" />
+          </button>
+        </div>
+
+        {/* Cart Summary */}
+        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+          <h3 className="font-semibold mb-2">Your Selected Tests:</h3>
+          <div className="space-y-2">
+            {cartItems.map(item => (
+              <div key={item.id} className="flex justify-between text-sm">
+                <span>{item.test.name} - {item.provider.name}</span>
+                <span className="font-medium">
+                  {currency === 'USD' ? '$' : 'L$'}{currency === 'USD' ? item.pricing.price_usd : item.pricing.price_lrd}
+                </span>
+              </div>
+            ))}
+          </div>
+          <div className="border-t pt-2 mt-2 flex justify-between font-bold">
+            <span>Total Amount:</span>
+            <span className="text-blue-600">{currency === 'USD' ? '$' : 'L$'}{total}</span>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Full Name *
+            </label>
+            <input
+              type="text"
+              required
+              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={formData.patient_name}
+              onChange={(e) => setFormData({...formData, patient_name: e.target.value})}
+              placeholder="Enter your full name"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Phone Number *
+            </label>
+            <input
+              type="tel"
+              required
+              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={formData.patient_phone}
+              onChange={(e) => setFormData({...formData, patient_phone: e.target.value})}
+              placeholder="+231 77 123 4567"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Location *
+            </label>
+            <input
+              type="text"
+              required
+              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={formData.patient_location}
+              onChange={(e) => setFormData({...formData, patient_location: e.target.value})}
+              placeholder="Your location for sample collection"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Result Delivery Method *
+            </label>
+            <select
+              required
+              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={formData.delivery_method}
+              onChange={(e) => setFormData({...formData, delivery_method: e.target.value})}
+            >
+              <option value="whatsapp">WhatsApp</option>
+              <option value="in_person">In-Person Pickup</option>
+            </select>
+          </div>
+
+          <div className="flex space-x-2 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-400"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 disabled:bg-gray-400"
+            >
+              {loading ? 'Booking...' : 'Confirm Booking'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   const { user } = useAuth();
   
