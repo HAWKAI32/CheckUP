@@ -1358,6 +1358,11 @@ class ChekUpTester:
             self.test_role_based_access_for_new_endpoints()  # NEW: Test role-based access for new endpoints
             self.test_data_validation_for_new_endpoints()  # NEW: Test data validation for new endpoints
             
+            # REVIEW REQUEST SPECIFIC TESTING
+            self.test_cart_booking_workflow()  # NEW: Test cart-based booking functionality
+            self.test_provider_communication_simulation()  # NEW: Test provider communication access
+            self.test_end_to_end_workflow_integration()  # NEW: Test complete end-to-end workflow
+            
             self.test_analytics_system()
             self.test_search_functionality()
             self.test_public_endpoints()
