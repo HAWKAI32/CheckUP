@@ -189,6 +189,7 @@ class SurgeryInquiryBase(BaseModel):
     preferred_hospital_location: str = "India"
     budget_range: str
     notes: Optional[str] = None
+    medical_report: Optional[dict] = None  # For file upload data
 
 class SurgeryInquiryCreate(SurgeryInquiryBase):
     pass
