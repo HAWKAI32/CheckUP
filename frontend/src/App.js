@@ -4305,6 +4305,104 @@ const UserRegistration = () => {
   );
 };
 
+// Cart Summary Component
+const CartSummary = () => {
+  const [cartItems, setCartItems] = useState([]);
+  const [currency, setCurrency] = useState('USD');
+
+  useEffect(() => {
+    const cart = JSON.parse(localStorage.getItem('chekup_cart') || '[]');
+    setCartItems(cart);
+  }, []);
+
+  const removeFromCart = (itemId) => {
+    const updatedCart = cartItems.filter(item => item.id !== itemId);
+    setCartItems(updatedCart);
+    localStorage.setItem('chekup_cart', JSON.stringify(updatedCart));
+  };
+
+  const clearCart = () => {
+    setCartItems([]);
+    localStorage.setItem('chekup_cart', JSON.stringify([]));
+  };
+
+  const calculateTotal = () => {
+    return cartItems.reduce((total, item) => {
+      const price = currency === 'USD' ? item.pricing.price_usd : item.pricing.price_lrd;
+      return total + price;
+    }, 0);
+  };
+
+  if (cartItems.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="mt-6 sm:mt-8 bg-white rounded-lg shadow-md p-4 sm:p-6">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg sm:text-xl font-bold">Cart Summary</h2>
+        <div className="flex items-center space-x-2">
+          <span className="text-sm">Currency:</span>
+          <select 
+            value={currency}
+            onChange={(e) => setCurrency(e.target.value)}
+            className="border rounded px-3 py-1 text-sm"
+          >
+            <option value="USD">USD</option>
+            <option value="LRD">LRD</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        {cartItems.map(item => (
+          <div key={item.id} className="flex items-center justify-between border-b pb-3">
+            <div className="flex-1">
+              <h3 className="font-semibold text-sm sm:text-base">{item.test.name}</h3>
+              <p className="text-xs sm:text-sm text-gray-600">{item.provider.name}</p>
+              <p className="text-xs text-gray-500">{item.provider.location}</p>
+            </div>
+            <div className="flex items-center space-x-3">
+              <span className="font-bold text-blue-600">
+                {currency === 'USD' ? '$' : 'L$'}{currency === 'USD' ? item.pricing.price_usd : item.pricing.price_lrd}
+              </span>
+              <button
+                onClick={() => removeFromCart(item.id)}
+                className="text-red-600 hover:text-red-800 p-1"
+              >
+                <XCircle className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex items-center justify-between pt-4 border-t">
+        <div>
+          <p className="text-lg font-bold text-blue-600">
+            Total: {currency === 'USD' ? '$' : 'L$'}{calculateTotal()}
+          </p>
+          <p className="text-sm text-gray-600">{cartItems.length} item(s) in cart</p>
+        </div>
+        <div className="space-x-2">
+          <button
+            onClick={clearCart}
+            className="bg-gray-300 text-gray-700 px-4 py-2 rounded text-sm hover:bg-gray-400"
+          >
+            Clear Cart
+          </button>
+          <button
+            onClick={() => alert('Checkout functionality coming soon!')}
+            className="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700"
+          >
+            Checkout
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   const { user } = useAuth();
   
