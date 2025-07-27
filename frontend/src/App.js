@@ -5067,17 +5067,41 @@ const CartSummary = () => {
   useEffect(() => {
     const cart = JSON.parse(localStorage.getItem('chekup_cart') || '[]');
     setCartItems(cart);
+
+    // Listen for cart update events
+    const handleCartUpdate = (event) => {
+      setCartItems(event.detail.cart);
+    };
+
+    window.addEventListener('cartUpdated', handleCartUpdate);
+
+    // Cleanup event listener
+    return () => {
+      window.removeEventListener('cartUpdated', handleCartUpdate);
+    };
   }, []);
 
   const removeFromCart = (itemId) => {
     const updatedCart = cartItems.filter(item => item.id !== itemId);
     setCartItems(updatedCart);
     localStorage.setItem('chekup_cart', JSON.stringify(updatedCart));
+    
+    // Dispatch cart update event
+    const cartUpdateEvent = new CustomEvent('cartUpdated', { 
+      detail: { cart: updatedCart } 
+    });
+    window.dispatchEvent(cartUpdateEvent);
   };
 
   const clearCart = () => {
     setCartItems([]);
     localStorage.setItem('chekup_cart', JSON.stringify([]));
+    
+    // Dispatch cart update event
+    const cartUpdateEvent = new CustomEvent('cartUpdated', { 
+      detail: { cart: [] } 
+    });
+    window.dispatchEvent(cartUpdateEvent);
   };
 
   const calculateTotal = () => {
