@@ -4403,6 +4403,220 @@ const CartSummary = () => {
   );
 };
 
+// New Test Providers Selection Page
+const TestProviders = () => {
+  const { testId } = useParams();
+  const navigate = useNavigate();
+  const [test, setTest] = useState(null);
+  const [providers, setProviders] = useState([]);
+  const [selectedProvider, setSelectedProvider] = useState(null);
+  const [pricing, setPricing] = useState(null);
+  const [currency, setCurrency] = useState('USD');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchTestDetails();
+    fetchTestProviders();
+  }, [testId]);
+
+  const fetchTestDetails = async () => {
+    try {
+      const response = await axios.get(`${API}/public/tests/${testId}`);
+      setTest(response.data);
+    } catch (error) {
+      console.error('Error fetching test details:', error);
+    }
+  };
+
+  const fetchTestProviders = async () => {
+    try {
+      const response = await axios.get(`${API}/public/tests/${testId}/providers`);
+      setProviders(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching test providers:', error);
+      setLoading(false);
+    }
+  };
+
+  const handleProviderSelect = async (provider) => {
+    try {
+      const response = await axios.get(`${API}/public/tests/${testId}/pricing/${provider.id}`);
+      setPricing(response.data);
+      setSelectedProvider(provider);
+    } catch (error) {
+      console.error('Error fetching pricing:', error);
+    }
+  };
+
+  const handleAddToCart = () => {
+    // Get existing cart from localStorage or initialize empty
+    const existingCart = JSON.parse(localStorage.getItem('chekup_cart') || '[]');
+    
+    const cartItem = {
+      test: test,
+      provider: selectedProvider,
+      pricing: pricing,
+      currency: currency,
+      id: `${test.id}_${selectedProvider.id}`
+    };
+
+    // Check if item already exists
+    const existingItemIndex = existingCart.findIndex(item => item.id === cartItem.id);
+    
+    if (existingItemIndex === -1) {
+      existingCart.push(cartItem);
+      localStorage.setItem('chekup_cart', JSON.stringify(existingCart));
+      alert('Test added to cart successfully!');
+    } else {
+      alert('This test is already in your cart!');
+    }
+  };
+
+  const handleCancel = () => {
+    setSelectedProvider(null);
+    setPricing(null);
+  };
+
+  const handleBack = () => {
+    navigate('/');
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading test providers...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-6 sm:py-8">
+        {/* Header */}
+        <div className="mb-6">
+          <button
+            onClick={handleBack}
+            className="flex items-center text-blue-600 hover:text-blue-800 mb-4"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Tests
+          </button>
+          
+          {test && (
+            <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+              <div className="flex items-center mb-4">
+                <Activity className="h-8 w-8 text-blue-600 mr-3" />
+                <div>
+                  <h1 className="text-xl sm:text-2xl font-bold">{test.name}</h1>
+                  <p className="text-sm sm:text-base text-gray-600">{test.description}</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <span className="bg-blue-100 text-blue-800 text-xs sm:text-sm px-3 py-1 rounded">
+                  {test.category}
+                </span>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm">Currency:</span>
+                  <select 
+                    value={currency}
+                    onChange={(e) => setCurrency(e.target.value)}
+                    className="border rounded px-3 py-1 text-sm"
+                  >
+                    <option value="USD">USD</option>
+                    <option value="LRD">LRD</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Provider Selection */}
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+          <h2 className="text-lg sm:text-xl font-bold mb-4">Select a Provider</h2>
+          
+          {providers.length > 0 ? (
+            <div className="space-y-4">
+              {providers.map(provider => (
+                <div 
+                  key={provider.id}
+                  className={`border rounded-lg p-4 cursor-pointer transition-colors ${
+                    selectedProvider?.id === provider.id 
+                      ? 'border-blue-500 bg-blue-50' 
+                      : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                  }`}
+                  onClick={() => handleProviderSelect(provider)}
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-base sm:text-lg">{provider.name}</h3>
+                      <p className="text-sm text-gray-600 mb-2">{provider.description}</p>
+                      <div className="flex flex-col sm:flex-row sm:items-center text-xs sm:text-sm text-gray-500 space-y-1 sm:space-y-0 sm:space-x-4">
+                        <div className="flex items-center">
+                          <MapPin className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                          <span>{provider.location}</span>
+                        </div>
+                        <div className="flex items-center">
+                          <Phone className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                          <span>{provider.phone}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {selectedProvider?.id === provider.id && pricing && (
+                      <div className="mt-3 sm:mt-0 sm:ml-4 text-right">
+                        <div className="text-xl sm:text-2xl font-bold text-blue-600">
+                          {currency === 'USD' ? '$' : 'L$'}{currency === 'USD' ? pricing.price_usd : pricing.price_lrd}
+                        </div>
+                        <div className="flex space-x-2 mt-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleAddToCart();
+                            }}
+                            className="bg-green-600 text-white px-3 sm:px-4 py-2 rounded text-sm hover:bg-green-700"
+                          >
+                            Add to Cart
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCancel();
+                            }}
+                            className="bg-gray-300 text-gray-700 px-3 sm:px-4 py-2 rounded text-sm hover:bg-gray-400"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <Building className="mx-auto h-12 w-12 text-gray-400" />
+              <h3 className="mt-2 text-sm font-medium text-gray-900">No Providers Available</h3>
+              <p className="mt-1 text-sm text-gray-500">
+                No providers currently offer this test. Please try another test or check back later.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Cart Summary */}
+        <CartSummary />
+      </div>
+    </div>
+  );
+};
+
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   const { user } = useAuth();
   
