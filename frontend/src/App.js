@@ -228,6 +228,7 @@ const Header = () => {
 };
 
 const Home = () => {
+  const navigate = useNavigate();
   const [tests, setTests] = useState([]);
   const [clinics, setClinics] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
