@@ -3447,7 +3447,8 @@ const SurgeryInquiry = () => {
     medical_condition: '',
     preferred_hospital_location: 'India',
     budget_range: '',
-    notes: ''
+    notes: '',
+    medical_report: null // New field for file upload
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
