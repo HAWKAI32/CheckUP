@@ -1111,6 +1111,177 @@ class ChekUpTester:
         
         return True
 
+    def test_new_test_provider_flow_endpoints(self):
+        """Test new test provider flow endpoints"""
+        print("\n=== Testing New Test Provider Flow Endpoints ===")
+        
+        if not self.test_data.get("test_id"):
+            self.log_result("Test Provider Flow", False, "No test ID available for testing")
+            return False
+        
+        test_id = self.test_data["test_id"]
+        
+        # Test GET /api/public/tests/{test_id}/providers - Get all providers that offer a specific test
+        response = self.make_request("GET", f"/public/tests/{test_id}/providers")
+        if response.status_code == 200:
+            providers = response.json()
+            self.log_result("Get Test Providers", True, f"Retrieved {len(providers)} providers for test")
+        else:
+            self.log_result("Get Test Providers", False, f"Status: {response.status_code}, Response: {response.text}")
+        
+        # Test GET /api/public/tests/{test_id}/pricing/{provider_id} - Get pricing for specific test from specific provider
+        if self.test_data.get("clinic_id"):
+            provider_id = self.test_data["clinic_id"]
+            response = self.make_request("GET", f"/public/tests/{test_id}/pricing/{provider_id}")
+            if response.status_code == 200:
+                pricing = response.json()
+                self.log_result("Get Test Provider Pricing", True, f"Retrieved pricing: USD ${pricing.get('price_usd', 0)}, LRD ${pricing.get('price_lrd', 0)}")
+            else:
+                self.log_result("Get Test Provider Pricing", False, f"Status: {response.status_code}, Response: {response.text}")
+        
+        # Test GET /api/public/tests/{test_id} - Get details for a specific test
+        response = self.make_request("GET", f"/public/tests/{test_id}")
+        if response.status_code == 200:
+            test_details = response.json()
+            self.log_result("Get Test Details", True, f"Retrieved test details: {test_details.get('name', 'N/A')}")
+        else:
+            self.log_result("Get Test Details", False, f"Status: {response.status_code}, Response: {response.text}")
+        
+        # Test error handling - invalid test ID
+        response = self.make_request("GET", "/public/tests/invalid-test-id/providers")
+        if response.status_code == 200:
+            providers = response.json()
+            if len(providers) == 0:
+                self.log_result("Invalid Test ID Providers", True, "Invalid test ID returns empty providers list")
+            else:
+                self.log_result("Invalid Test ID Providers", False, "Invalid test ID should return empty list")
+        else:
+            self.log_result("Invalid Test ID Providers", True, f"Invalid test ID properly handled with status {response.status_code}")
+        
+        # Test error handling - invalid provider ID
+        response = self.make_request("GET", f"/public/tests/{test_id}/pricing/invalid-provider-id")
+        if response.status_code == 404:
+            self.log_result("Invalid Provider ID Pricing", True, "Invalid provider ID properly returns 404")
+        else:
+            self.log_result("Invalid Provider ID Pricing", False, f"Expected 404 for invalid provider, got {response.status_code}")
+        
+        # Test error handling - invalid test ID for details
+        response = self.make_request("GET", "/public/tests/invalid-test-id")
+        if response.status_code == 404:
+            self.log_result("Invalid Test ID Details", True, "Invalid test ID properly returns 404")
+        else:
+            self.log_result("Invalid Test ID Details", False, f"Expected 404 for invalid test, got {response.status_code}")
+        
+        return True
+
+    def test_surgery_inquiry_file_upload(self):
+        """Test surgery inquiry creation with optional medical report file upload"""
+        print("\n=== Testing Surgery Inquiry File Upload ===")
+        
+        # Test surgery inquiry creation WITHOUT file upload (should work)
+        inquiry_data_no_file = {
+            "patient_name": "Emma Wilson",
+            "patient_phone": "+231-777-444555",
+            "patient_email": "emma.wilson@email.com",
+            "surgery_type": "Knee Replacement Surgery",
+            "medical_condition": "Severe osteoarthritis in both knees",
+            "preferred_hospital_location": "India",
+            "budget_range": "$8,000 - $12,000",
+            "notes": "Looking for minimally invasive procedure"
+        }
+        
+        response = self.make_request("POST", "/surgery-inquiries", inquiry_data_no_file)
+        if response.status_code in [200, 201]:
+            inquiry_response = response.json()
+            self.log_result("Surgery Inquiry Without File", True, f"Created inquiry: {inquiry_response['inquiry_number']}")
+        else:
+            self.log_result("Surgery Inquiry Without File", False, f"Status: {response.status_code}, Response: {response.text}")
+        
+        # Test surgery inquiry creation WITH file upload (base64 encoded medical report)
+        # Create a mock medical report file
+        medical_report_content = {
+            "filename": "medical_report.pdf",
+            "content_type": "application/pdf",
+            "data": base64.b64encode(b"Mock medical report content for testing").decode('utf-8')
+        }
+        
+        inquiry_data_with_file = {
+            "patient_name": "David Chen",
+            "patient_phone": "+231-777-666777",
+            "patient_email": "david.chen@email.com",
+            "surgery_type": "Heart Bypass Surgery",
+            "medical_condition": "Multiple coronary artery blockages",
+            "preferred_hospital_location": "India",
+            "budget_range": "$20,000 - $30,000",
+            "notes": "Urgent case - need immediate consultation",
+            "medical_report": medical_report_content
+        }
+        
+        response = self.make_request("POST", "/surgery-inquiries", inquiry_data_with_file)
+        if response.status_code in [200, 201]:
+            inquiry_response = response.json()
+            self.test_data["file_inquiry_id"] = inquiry_response["id"]
+            self.log_result("Surgery Inquiry With File", True, f"Created inquiry with file: {inquiry_response['inquiry_number']}")
+            
+            # Verify the medical_report field was stored
+            if inquiry_response.get("medical_report"):
+                self.log_result("Medical Report Storage", True, "Medical report file data stored successfully")
+            else:
+                self.log_result("Medical Report Storage", False, "Medical report file data not stored")
+        else:
+            self.log_result("Surgery Inquiry With File", False, f"Status: {response.status_code}, Response: {response.text}")
+        
+        # Test with malformed file data
+        malformed_file_data = {
+            "patient_name": "Test Patient Malformed",
+            "patient_phone": "+231-777-000111",
+            "patient_email": "test@malformed.com",
+            "surgery_type": "Test Surgery",
+            "medical_condition": "Test condition",
+            "preferred_hospital_location": "India",
+            "budget_range": "$5,000 - $10,000",
+            "notes": "Test with malformed file data",
+            "medical_report": "invalid_file_data"  # This should be a dict, not a string
+        }
+        
+        response = self.make_request("POST", "/surgery-inquiries", malformed_file_data)
+        if response.status_code in [200, 201]:
+            # If it accepts malformed data, that's okay as long as it doesn't crash
+            self.log_result("Malformed File Data Handling", True, "Malformed file data handled gracefully")
+        elif response.status_code in [400, 422]:
+            # If it rejects malformed data with proper error, that's also good
+            self.log_result("Malformed File Data Handling", True, "Malformed file data properly rejected with validation error")
+        else:
+            self.log_result("Malformed File Data Handling", False, f"Unexpected response to malformed data: {response.status_code}")
+        
+        # Test large file data (simulate large base64 content)
+        large_file_content = "A" * 10000  # 10KB of data
+        large_medical_report = {
+            "filename": "large_medical_report.pdf",
+            "content_type": "application/pdf",
+            "data": base64.b64encode(large_file_content.encode()).decode('utf-8')
+        }
+        
+        large_file_inquiry = {
+            "patient_name": "Large File Test Patient",
+            "patient_phone": "+231-777-888000",
+            "patient_email": "largefile@test.com",
+            "surgery_type": "Test Surgery Large File",
+            "medical_condition": "Test condition with large file",
+            "preferred_hospital_location": "India",
+            "budget_range": "$10,000 - $15,000",
+            "notes": "Testing large file upload",
+            "medical_report": large_medical_report
+        }
+        
+        response = self.make_request("POST", "/surgery-inquiries", large_file_inquiry)
+        if response.status_code in [200, 201]:
+            self.log_result("Large File Upload", True, "Large file upload handled successfully")
+        else:
+            self.log_result("Large File Upload", False, f"Large file upload failed: {response.status_code}")
+        
+        return True
+
     def test_existing_functionality_integrity(self):
         """Test that existing admin and clinic functionality still works"""
         print("\n=== Testing Existing Functionality Integrity ===")
