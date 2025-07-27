@@ -2108,6 +2108,17 @@ const AdminDashboard = () => {
                 Surgery & Accommodation Management
               </button>
             </div>
+            <div className="px-6 py-2">
+              <button
+                onClick={() => setActiveTab('pricing')}
+                className={`flex items-center w-full px-2 py-2 text-sm rounded ${
+                  activeTab === 'pricing' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <DollarSign className="mr-3 h-4 w-4" />
+                Test Assignment & Pricing
+              </button>
+            </div>
           </nav>
         </div>
 
