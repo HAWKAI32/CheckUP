@@ -1229,6 +1229,80 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleViewMedicalReport = (medicalReport) => {
+    if (!medicalReport || !medicalReport.data) {
+      alert('No medical report available for this surgery inquiry.');
+      return;
+    }
+
+    // Create a modal to display the file
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+    modal.innerHTML = `
+      <div class="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold">Medical Report</h3>
+          <button class="text-gray-500 hover:text-gray-700 close-modal">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div class="mb-4">
+          <p><strong>File Name:</strong> ${medicalReport.name}</p>
+          <p><strong>File Type:</strong> ${medicalReport.type}</p>
+          <p><strong>File Size:</strong> ${(medicalReport.size / 1024 / 1024).toFixed(2)} MB</p>
+        </div>
+        <div class="flex space-x-4">
+          <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 download-btn">
+            Download File
+          </button>
+          ${medicalReport.type.startsWith('image/') ? `
+            <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 view-btn">
+              View Image
+            </button>
+          ` : ''}
+        </div>
+        <div class="mt-4 preview-area"></div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Close modal event
+    modal.querySelector('.close-modal').addEventListener('click', () => {
+      document.body.removeChild(modal);
+    });
+
+    // Download file event
+    modal.querySelector('.download-btn').addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.href = medicalReport.data;
+      link.download = medicalReport.name;
+      link.click();
+    });
+
+    // View image event (if image file)
+    const viewBtn = modal.querySelector('.view-btn');
+    if (viewBtn) {
+      viewBtn.addEventListener('click', () => {
+        const previewArea = modal.querySelector('.preview-area');
+        previewArea.innerHTML = `
+          <div class="mt-4">
+            <img src="${medicalReport.data}" alt="Medical Report" class="max-w-full h-auto border rounded" />
+          </div>
+        `;
+      });
+    }
+
+    // Close modal when clicking outside
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        document.body.removeChild(modal);
+      }
+    });
+  };
+
   if (user?.role !== 'admin') {
     return <Navigate to="/admin-login" />;
   }
