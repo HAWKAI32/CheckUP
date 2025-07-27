@@ -4326,6 +4326,7 @@ function App() {
           <Header />
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/test/:testId/providers" element={<TestProviders />} />
             <Route path="/admin-login" element={<Login />} />
             <Route path="/surgery-inquiry" element={<SurgeryInquiry />} />
             <Route 
