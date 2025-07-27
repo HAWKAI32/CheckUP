@@ -2134,6 +2134,102 @@ const AdminDashboard = () => {
       </div>
     </div>
   );
+
+  const renderTestAssignmentAndPricing = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold">Test Assignment & Pricing Management</h2>
+        <PricingForm tests={tests} clinics={clinics} onSuccess={() => window.location.reload()} />
+      </div>
+
+      {/* Existing Test Pricing Table */}
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="px-6 py-4 border-b">
+          <h3 className="text-lg font-semibold">Current Test Assignments</h3>
+          <p className="text-sm text-gray-600">Manage which tests each provider offers and their pricing</p>
+        </div>
+        
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Provider</th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Test</th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price (USD)</th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price (LRD)</th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              <tr>
+                <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                  <div className="flex flex-col items-center">
+                    <DollarSign className="h-12 w-12 text-gray-400 mb-2" />
+                    <p>Test pricing data will appear here</p>
+                    <p className="text-sm">Use the "Add Test Pricing" button to assign tests to providers</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Provider Test Assignment Overview */}
+      <div className="grid md:grid-cols-2 gap-6">
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold mb-4">Providers & Their Tests</h3>
+          <div className="space-y-4">
+            {clinics.map(clinic => (
+              <div key={clinic.id} className="border rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-medium">{clinic.name}</h4>
+                  <span className="text-sm text-gray-500">{clinic.location}</span>
+                </div>
+                <div className="text-sm text-gray-600">
+                  <p>Assigned Tests: <span className="font-medium">View & manage in table above</span></p>
+                </div>
+              </div>
+            ))}
+            
+            {clinics.length === 0 && (
+              <div className="text-center py-8">
+                <Building className="mx-auto h-12 w-12 text-gray-400" />
+                <p className="text-gray-500 mt-2">No providers available</p>
+                <p className="text-sm text-gray-400">Create providers first to assign tests</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold mb-4">Available Tests</h3>
+          <div className="space-y-2 max-h-80 overflow-y-auto">
+            {tests.map(test => (
+              <div key={test.id} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                <div>
+                  <p className="font-medium text-sm">{test.name}</p>
+                  <p className="text-xs text-gray-600">{test.category}</p>
+                </div>
+                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                  Available
+                </span>
+              </div>
+            ))}
+            
+            {tests.length === 0 && (
+              <div className="text-center py-8">
+                <TestTube className="mx-auto h-12 w-12 text-gray-400" />
+                <p className="text-gray-500 mt-2">No tests available</p>
+                <p className="text-sm text-gray-400">Create tests first to assign to providers</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 const SubAdminForm = ({ onSuccess }) => {
