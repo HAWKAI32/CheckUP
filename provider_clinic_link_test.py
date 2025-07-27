@@ -149,7 +149,7 @@ class ProviderClinicLinkTester:
         booking_data = {
             "patient_name": "Provider Communication Patient",
             "patient_phone": "+231-777-888999",
-            "patient_email": "patient@communication.test",
+            "patient_email": "patient@communication.com",
             "patient_location": "Test Location, Monrovia",
             "test_ids": [self.test_data["test_id"]],
             "clinic_id": self.test_data["clinic_id"],
