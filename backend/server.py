@@ -756,6 +756,40 @@ async def get_public_test_pricing(test_id: str):
 async def get_public_clinic_tests(clinic_id: str):
     return await get_clinic_tests(clinic_id)
 
+# New endpoints for test provider flow
+@api_router.get("/public/tests/{test_id}/providers")
+async def get_test_providers(test_id: str):
+    """Get all providers that offer a specific test"""
+    pricing_records = await db.test_pricing.find({"test_id": test_id, "is_available": True}).to_list(1000)
+    
+    provider_ids = [record["clinic_id"] for record in pricing_records]
+    providers = await db.clinics.find({"id": {"$in": provider_ids}}).to_list(1000)
+    
+    return [Clinic(**provider) for provider in providers]
+
+@api_router.get("/public/tests/{test_id}/pricing/{provider_id}")
+async def get_test_provider_pricing(test_id: str, provider_id: str):
+    """Get pricing for a specific test from a specific provider"""
+    pricing = await db.test_pricing.find_one({
+        "test_id": test_id,
+        "clinic_id": provider_id,
+        "is_available": True
+    })
+    
+    if not pricing:
+        raise HTTPException(status_code=404, detail="Pricing not found")
+    
+    return TestPricing(**pricing)
+
+@api_router.get("/public/tests/{test_id}")
+async def get_test_details(test_id: str):
+    """Get details for a specific test"""
+    test = await db.tests.find_one({"id": test_id})
+    if not test:
+        raise HTTPException(status_code=404, detail="Test not found")
+    
+    return Test(**test)
+
 # User Management endpoints (Admin only)
 @api_router.get("/users", response_model=List[User])
 async def get_all_users(current_user: User = Depends(get_admin_user)):
