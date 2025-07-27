@@ -398,14 +398,13 @@ metadata:
   run_ui: true
 
 test_plan:
-  current_focus: 
-    - "Cart functionality - auto-show buttons after adding items"
-    - "Admin dashboard CRUD operations - ensure delete/edit feedback"
+  current_focus: []
   stuck_tasks: []
   test_all: false
-  test_priority: "high_first"
+  test_priority: "completed"
   admin_management_features_tested: true
   new_features_tested: true
+  review_request_testing_completed: true
 
   - task: "Make ChekUp platform fully responsive"
     implemented: true
