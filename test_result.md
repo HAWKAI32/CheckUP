@@ -355,6 +355,30 @@ frontend:
         agent: "main"
         comment: "PROFESSIONAL UI CONFIRMED! Beautiful medical-themed design with professional doctor image in hero section. Clean layout, proper branding, responsive design all visible and working."
 
+  - task: "Cart functionality - auto-show buttons after adding items"
+    implemented: false
+    working: false
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "main"
+        comment: "ISSUE IDENTIFIED: After adding test to cart in TestProviders component, CartSummary doesn't automatically show 'Clear Cart'/'Book Test' buttons. Problem: CartSummary has its own state and only updates on component mount. Need to implement real-time cart state synchronization."
+
+  - task: "Admin dashboard CRUD operations - ensure delete/edit feedback"
+    implemented: false
+    working: false
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "main"
+        comment: "ISSUE IDENTIFIED: In 'Test Assignment & Pricing' section (lines 1637-1642), delete/edit buttons don't have onClick handlers. In 'Provider Communication Access' section, some operations exist but need feedback improvement. Need to add proper CRUD handlers and visual feedback."
+
 metadata:
   created_by: "main_agent"
   version: "1.2"
