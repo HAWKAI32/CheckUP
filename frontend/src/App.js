@@ -2119,6 +2119,17 @@ const AdminDashboard = () => {
                 Test Assignment & Pricing
               </button>
             </div>
+            <div className="px-6 py-2">
+              <button
+                onClick={() => setActiveTab('communication')}
+                className={`flex items-center w-full px-2 py-2 text-sm rounded ${
+                  activeTab === 'communication' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <Users className="mr-3 h-4 w-4" />
+                Provider Communication Access
+              </button>
+            </div>
           </nav>
         </div>
 
