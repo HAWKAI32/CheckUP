@@ -1176,24 +1176,6 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleResetProviderPassword = async (providerId, email) => {
-    try {
-      // Generate a new random password
-      const newPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-4).toUpperCase();
-      
-      await axios.put(`${API}/users/${providerId}`, { 
-        password: newPassword,
-        updated_at: new Date().toISOString()
-      });
-      
-      alert(`Password reset successfully!\n\nProvider Login Credentials:\nEmail: ${email}\nNew Password: ${newPassword}\n\nPlease provide these credentials to the healthcare provider.`);
-      
-    } catch (error) {
-      console.error('Error resetting provider password:', error);
-      alert('Error resetting password. Please try again.');
-    }
-  };
-
   const handleSendBookingsToProvider = async (providerId) => {
     try {
       const providerBookings = bookings.filter(b => b.clinic_id === providerId && b.status === 'pending');
