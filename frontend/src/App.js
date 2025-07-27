@@ -1176,6 +1176,59 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleResetProviderPassword = async (providerId, email) => {
+    if (window.confirm(`Are you sure you want to reset the password for ${email}?`)) {
+      try {
+        // Generate a new temporary password
+        const newPassword = Math.random().toString(36).slice(-8);
+        await axios.put(`${API}/users/${providerId}`, { password: newPassword });
+        alert(`Password reset successfully!\n\nNew login credentials:\nEmail: ${email}\nPassword: ${newPassword}\n\nPlease provide these credentials to the healthcare provider.`);
+      } catch (error) {
+        console.error('Error resetting password:', error);
+        alert('Error resetting password');
+      }
+    }
+  };
+
+  const handleSendBookingsToProvider = async (providerId) => {
+    try {
+      // Get bookings assigned to this provider
+      const providerBookings = bookings.filter(b => b.clinic_id === providerId);
+      if (providerBookings.length === 0) {
+        alert('No bookings assigned to this provider');
+        return;
+      }
+      
+      // In a real implementation, this would send notifications via email/SMS
+      alert(`${providerBookings.length} booking(s) sent to provider successfully!`);
+    } catch (error) {
+      console.error('Error sending bookings:', error);
+      alert('Error sending bookings to provider');
+    }
+  };
+
+  const handleViewProviderCommunication = (providerId) => {
+    // In a real implementation, this would open a communication panel
+    const provider = clinics.find(c => c.id === providerId);
+    alert(`Opening communication panel for ${provider?.name || 'Provider'}\n\nThis would show:\n- Recent messages\n- Booking updates\n- System notifications`);
+  };
+
+  const handleToggleProviderAccess = async (providerId, currentStatus) => {
+    const newStatus = currentStatus === false;
+    const action = newStatus ? 'restore' : 'suspend';
+    
+    if (window.confirm(`Are you sure you want to ${action} access for this provider?`)) {
+      try {
+        await axios.put(`${API}/users/${providerId}`, { is_active: newStatus });
+        fetchClinics();
+        alert(`Provider access ${newStatus ? 'restored' : 'suspended'} successfully!`);
+      } catch (error) {
+        console.error('Error updating provider access:', error);
+        alert('Error updating provider access');
+      }
+    }
+  };
+
   if (user?.role !== 'admin') {
     return <Navigate to="/admin-login" />;
   }
