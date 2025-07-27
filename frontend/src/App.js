@@ -1229,6 +1229,40 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleEditTestAssignment = (test) => {
+    alert(`Edit test assignment: ${test.name} (Feature to be implemented)`);
+  };
+
+  const handleDeleteTestAssignment = async (testId) => {
+    if (window.confirm('Are you sure you want to delete this test assignment? This action cannot be undone.')) {
+      try {
+        await axios.delete(`${API}/tests/${testId}`);
+        fetchTests();
+        alert('Test assignment deleted successfully!');
+      } catch (error) {
+        console.error('Error deleting test assignment:', error);
+        alert('Error deleting test assignment');
+      }
+    }
+  };
+
+  const handleEditClinicAssignment = (clinic) => {
+    alert(`Edit clinic assignment: ${clinic.name} (Feature to be implemented)`);
+  };
+
+  const handleDeleteClinicAssignment = async (clinicId) => {
+    if (window.confirm('Are you sure you want to delete this clinic assignment? This will also delete their login account.')) {
+      try {
+        await axios.delete(`${API}/clinics/${clinicId}`);
+        fetchClinics();
+        alert('Clinic assignment deleted successfully!');
+      } catch (error) {
+        console.error('Error deleting clinic assignment:', error);
+        alert('Error deleting clinic assignment');
+      }
+    }
+  };
+
   const handleViewMedicalReport = (medicalReport) => {
     if (!medicalReport || !medicalReport.data) {
       alert('No medical report available for this surgery inquiry.');
