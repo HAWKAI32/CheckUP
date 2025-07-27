@@ -5673,6 +5673,30 @@ function App() {
           </Routes>
         </BrowserRouter>
       </AuthProvider>
+      
+      {/* Edit Test Modal */}
+      {editTestModal.show && (
+        <EditTestModal 
+          test={editTestModal.test}
+          onClose={() => setEditTestModal({ show: false, test: null })}
+          onSuccess={() => {
+            fetchTests();
+            setEditTestModal({ show: false, test: null });
+          }}
+        />
+      )}
+      
+      {/* Edit Clinic Modal */}
+      {editClinicModal.show && (
+        <EditClinicModal 
+          clinic={editClinicModal.clinic}
+          onClose={() => setEditClinicModal({ show: false, clinic: null })}
+          onSuccess={() => {
+            fetchClinics();
+            setEditClinicModal({ show: false, clinic: null });
+          }}
+        />
+      )}
     </div>
   );
 }
