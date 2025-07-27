@@ -1328,6 +1328,240 @@ class ChekUpTester:
         
         return True
 
+    def test_cart_booking_workflow(self):
+        """Test cart-based booking workflow simulation"""
+        print("\n=== Testing Cart-Based Booking Workflow ===")
+        
+        if not self.test_data.get("test_id") or not self.test_data.get("clinic_id"):
+            self.log_result("Cart Booking Workflow", False, "Missing required test or clinic data")
+            return False
+        
+        # Simulate cart with multiple tests - create multiple bookings for different tests
+        test_ids = [self.test_data["test_id"]]
+        
+        # Create additional test for cart simulation
+        if self.admin_token:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            additional_test_data = {
+                "name": "Lipid Profile Test",
+                "description": "Comprehensive cholesterol and lipid analysis",
+                "category": "Biochemistry",
+                "preparation_instructions": "12-hour fasting required"
+            }
+            
+            response = self.make_request("POST", "/tests", additional_test_data, headers)
+            if response.status_code in [200, 201]:
+                additional_test = response.json()
+                test_ids.append(additional_test["id"])
+                
+                # Create pricing for the additional test
+                pricing_data = {
+                    "test_id": additional_test["id"],
+                    "clinic_id": self.test_data["clinic_id"],
+                    "price_usd": 35.00,
+                    "price_lrd": 6300.00,
+                    "is_available": True
+                }
+                
+                response = self.make_request("POST", "/test-pricing", pricing_data, headers)
+                if response.status_code in [200, 201]:
+                    self.log_result("Cart Test Setup", True, "Additional test and pricing created for cart simulation")
+        
+        # Simulate cart booking - create booking with multiple tests
+        cart_booking_data = {
+            "patient_name": "Jennifer Martinez",
+            "patient_phone": "+231-777-123789",
+            "patient_email": "jennifer.martinez@email.com",
+            "patient_location": "Paynesville, Monrovia",
+            "test_ids": test_ids,  # Multiple tests simulating cart items
+            "clinic_id": self.test_data["clinic_id"],
+            "delivery_method": "whatsapp",
+            "preferred_currency": "USD",
+            "delivery_charge": 7.50,
+            "notes": "Cart booking with multiple tests - please coordinate sample collection"
+        }
+        
+        response = self.make_request("POST", "/bookings", cart_booking_data)
+        if response.status_code in [200, 201]:
+            booking_response = response.json()
+            self.test_data["cart_booking_id"] = booking_response["id"]
+            total_tests = len(test_ids)
+            self.log_result("Cart-Based Booking Creation", True, 
+                          f"Cart booking created: {booking_response['booking_number']} with {total_tests} tests, Total: ${booking_response['total_amount']}")
+        else:
+            self.log_result("Cart-Based Booking Creation", False, 
+                          f"Status: {response.status_code}, Response: {response.text}")
+            return False
+        
+        # Test individual booking record creation (verify booking contains all cart items)
+        if self.admin_token and self.test_data.get("cart_booking_id"):
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            booking_id = self.test_data["cart_booking_id"]
+            
+            response = self.make_request("GET", f"/bookings/{booking_id}", headers=headers)
+            if response.status_code == 200:
+                booking = response.json()
+                booking_test_ids = booking.get("test_ids", [])
+                
+                if len(booking_test_ids) == len(test_ids):
+                    self.log_result("Cart Items in Booking", True, 
+                                  f"All {len(test_ids)} cart items properly stored in booking record")
+                else:
+                    self.log_result("Cart Items in Booking", False, 
+                                  f"Expected {len(test_ids)} tests, found {len(booking_test_ids)}")
+            else:
+                self.log_result("Cart Items in Booking", False, f"Could not retrieve booking: {response.status_code}")
+        
+        return True
+
+    def test_provider_communication_simulation(self):
+        """Test provider communication access simulation"""
+        print("\n=== Testing Provider Communication Access ===")
+        
+        # Since there are no specific provider communication endpoints, 
+        # we'll test the existing clinic user functionality as provider communication
+        
+        if not self.clinic_token:
+            self.log_result("Provider Communication", False, "No clinic token available for provider simulation")
+            return False
+        
+        headers = {"Authorization": f"Bearer {self.clinic_token}"}
+        
+        # Test provider (clinic) can view assigned bookings
+        response = self.make_request("GET", "/bookings", headers=headers)
+        if response.status_code == 200:
+            bookings = response.json()
+            self.log_result("Provider View Assigned Bookings", True, 
+                          f"Provider can view {len(bookings)} assigned bookings")
+        else:
+            self.log_result("Provider View Assigned Bookings", False, 
+                          f"Provider booking access failed: {response.status_code}")
+        
+        # Test provider can update booking status (communication with admin/sub-admin)
+        if self.test_data.get("booking_id"):
+            booking_id = self.test_data["booking_id"]
+            status_update = {"status": "results_ready"}
+            
+            response = self.make_request("PUT", f"/bookings/{booking_id}/status", 
+                                       status_update, headers)
+            if response.status_code == 200:
+                self.log_result("Provider Booking Status Update", True, 
+                              "Provider can update booking status for communication")
+            else:
+                self.log_result("Provider Booking Status Update", False, 
+                              f"Provider status update failed: {response.status_code}")
+        
+        # Test provider access restrictions (cannot access admin functions)
+        response = self.make_request("GET", "/analytics/dashboard", headers=headers)
+        if response.status_code == 403:
+            self.log_result("Provider Admin Access Restriction", True, 
+                          "Provider properly restricted from admin functions")
+        else:
+            self.log_result("Provider Admin Access Restriction", False, 
+                          f"Provider should be restricted from admin access: {response.status_code}")
+        
+        # Test provider cannot access user management
+        response = self.make_request("GET", "/users", headers=headers)
+        if response.status_code == 403:
+            self.log_result("Provider User Management Restriction", True, 
+                          "Provider properly restricted from user management")
+        else:
+            self.log_result("Provider User Management Restriction", False, 
+                          f"Provider should be restricted from user management: {response.status_code}")
+        
+        return True
+
+    def test_end_to_end_workflow_integration(self):
+        """Test complete end-to-end workflow integration"""
+        print("\n=== Testing End-to-End Workflow Integration ===")
+        
+        # Test complete patient booking workflow
+        # 1. Patient browses tests (public endpoint)
+        response = self.make_request("GET", "/public/tests")
+        if response.status_code == 200:
+            tests = response.json()
+            if len(tests) > 0:
+                selected_test = tests[0]
+                self.log_result("E2E: Patient Browse Tests", True, 
+                              f"Patient can browse {len(tests)} available tests")
+                
+                # 2. Patient selects test and views providers
+                test_id = selected_test["id"]
+                response = self.make_request("GET", f"/public/tests/{test_id}/providers")
+                if response.status_code == 200:
+                    providers = response.json()
+                    self.log_result("E2E: Patient View Providers", True, 
+                                  f"Patient can view {len(providers)} providers for selected test")
+                    
+                    if len(providers) > 0:
+                        # 3. Patient checks pricing
+                        provider_id = providers[0]["id"]
+                        response = self.make_request("GET", f"/public/tests/{test_id}/pricing/{provider_id}")
+                        if response.status_code == 200:
+                            pricing = response.json()
+                            self.log_result("E2E: Patient Check Pricing", True, 
+                                          f"Patient can view pricing: USD ${pricing.get('price_usd', 0)}")
+                            
+                            # 4. Patient creates booking
+                            booking_data = {
+                                "patient_name": "End-to-End Test Patient",
+                                "patient_phone": "+231-777-999000",
+                                "patient_email": "e2e@test.com",
+                                "patient_location": "E2E Test Location",
+                                "test_ids": [test_id],
+                                "clinic_id": provider_id,
+                                "delivery_method": "whatsapp",
+                                "preferred_currency": "USD",
+                                "delivery_charge": 5.00,
+                                "notes": "End-to-end workflow test booking"
+                            }
+                            
+                            response = self.make_request("POST", "/bookings", booking_data)
+                            if response.status_code in [200, 201]:
+                                booking = response.json()
+                                e2e_booking_id = booking["id"]
+                                self.log_result("E2E: Patient Create Booking", True, 
+                                              f"Patient successfully created booking: {booking['booking_number']}")
+                                
+                                # 5. Admin/Sub-admin manages booking
+                                if self.admin_token:
+                                    headers = {"Authorization": f"Bearer {self.admin_token}"}
+                                    
+                                    # Admin views booking
+                                    response = self.make_request("GET", f"/bookings/{e2e_booking_id}", headers=headers)
+                                    if response.status_code == 200:
+                                        self.log_result("E2E: Admin View Booking", True, 
+                                                      "Admin can view and manage patient booking")
+                                        
+                                        # Admin assigns/updates booking
+                                        response = self.make_request("PUT", f"/bookings/{e2e_booking_id}/status", 
+                                                                   {"status": "confirmed"}, headers)
+                                        if response.status_code == 200:
+                                            self.log_result("E2E: Admin Manage Booking", True, 
+                                                          "Admin successfully manages booking workflow")
+                                        else:
+                                            self.log_result("E2E: Admin Manage Booking", False, 
+                                                          f"Admin booking management failed: {response.status_code}")
+                                    else:
+                                        self.log_result("E2E: Admin View Booking", False, 
+                                                      f"Admin cannot view booking: {response.status_code}")
+                            else:
+                                self.log_result("E2E: Patient Create Booking", False, 
+                                              f"Patient booking creation failed: {response.status_code}")
+                        else:
+                            self.log_result("E2E: Patient Check Pricing", False, 
+                                          f"Patient pricing check failed: {response.status_code}")
+                else:
+                    self.log_result("E2E: Patient View Providers", False, 
+                                  f"Patient provider view failed: {response.status_code}")
+            else:
+                self.log_result("E2E: Patient Browse Tests", False, "No tests available for patient browsing")
+        else:
+            self.log_result("E2E: Patient Browse Tests", False, 
+                          f"Patient test browsing failed: {response.status_code}")
+        
+        return True
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🏥 ChekUp Backend Comprehensive Testing")
