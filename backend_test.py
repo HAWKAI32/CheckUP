@@ -1348,6 +1348,10 @@ class ChekUpTester:
             self.test_feedback_system()
             self.test_surgery_inquiry_system()
             
+            # NEW FEATURES TESTING - Test Provider Flow and Surgery File Upload
+            self.test_new_test_provider_flow_endpoints()  # NEW: Test provider flow endpoints
+            self.test_surgery_inquiry_file_upload()  # NEW: Test surgery inquiry file upload
+            
             # NEW ADMIN MANAGEMENT FEATURES TESTING
             self.test_admin_user_management()  # NEW: Test admin user management endpoints
             self.test_admin_surgery_inquiry_management()  # NEW: Test admin surgery inquiry management
