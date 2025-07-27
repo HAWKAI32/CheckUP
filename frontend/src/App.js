@@ -2067,13 +2067,21 @@ const AdminDashboard = () => {
                     </div>
                   </td>
                   <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
-                    <div className="flex space-x-2">
+                    <div className="flex flex-col space-y-1">
                       <SurgeryInquiryManager 
                         inquiry={inquiry}
                         onUpdate={fetchSurgeryInquiries}
                       />
+                      {inquiry.medical_report && (
+                        <button 
+                          className="text-green-600 hover:text-green-800 text-xs px-2 py-1 border border-green-300 rounded"
+                          onClick={() => handleViewMedicalReport(inquiry.medical_report)}
+                        >
+                          View Report
+                        </button>
+                      )}
                       <button 
-                        className="text-red-600 hover:text-red-800 text-sm"
+                        className="text-red-600 hover:text-red-800 text-xs px-2 py-1 border border-red-300 rounded"
                         onClick={() => handleSurgeryInquiryDelete(inquiry.id)}
                       >
                         Delete
