@@ -1234,7 +1234,7 @@ const AdminDashboard = () => {
   };
 
   const handleEditTestAssignment = (test) => {
-    alert(`Edit test assignment: ${test.name} (Feature to be implemented)`);
+    setEditTestModal({ show: true, test: test });
   };
 
   const handleDeleteTestAssignment = async (testId) => {
@@ -1251,7 +1251,7 @@ const AdminDashboard = () => {
   };
 
   const handleEditClinicAssignment = (clinic) => {
-    alert(`Edit clinic assignment: ${clinic.name} (Feature to be implemented)`);
+    setEditClinicModal({ show: true, clinic: clinic });
   };
 
   const handleDeleteClinicAssignment = async (clinicId) => {
