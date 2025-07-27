@@ -271,9 +271,8 @@ const Home = () => {
   };
 
   const handleTestSelect = (test) => {
-    fetchTestPricing(test.id);
-    setSelectedTests([test]);
-    setSelectedClinic(null);
+    // Navigate to test providers page
+    navigate(`/test/${test.id}/providers`);
   };
 
   const handleClinicSelect = async (clinic) => {
