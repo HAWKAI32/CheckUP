@@ -1082,6 +1082,10 @@ const AdminDashboard = () => {
   const [subAdmins, setSubAdmins] = useState([]);
   const [surgeryInquiries, setSurgeryInquiries] = useState([]);
   
+  // Edit modal states
+  const [editTestModal, setEditTestModal] = useState({ show: false, test: null });
+  const [editClinicModal, setEditClinicModal] = useState({ show: false, clinic: null });
+  
   useEffect(() => {
     if (user?.role !== 'admin') return;
     
