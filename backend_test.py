@@ -13,7 +13,7 @@ from datetime import datetime
 from typing import Dict, List, Optional
 
 # Configuration
-BASE_URL = "https://952edcb4-f032-46dc-a06d-39918eaceb55.preview.emergentagent.com/api"
+BASE_URL = "https://0890244b-bfed-479c-8063-7074a7d2a140.preview.emergentagent.com/api"
 TIMEOUT = 30
 
 class ChekUpTester:
