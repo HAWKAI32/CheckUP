@@ -1176,62 +1176,6 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleSendBookingsToProvider = async (providerId) => {
-    try {
-      const providerBookings = bookings.filter(b => b.clinic_id === providerId && b.status === 'pending');
-      
-      if (providerBookings.length === 0) {
-        alert('No pending bookings to send to this provider.');
-        return;
-      }
-
-      // Update bookings status to 'confirmed' to indicate they've been sent
-      for (const booking of providerBookings) {
-        await axios.put(`${API}/bookings/${booking.id}/status`, { status: 'confirmed' });
-      }
-      
-      fetchBookings();
-      alert(`Successfully sent ${providerBookings.length} booking(s) to the provider. They can now access these bookings in their communication portal.`);
-      
-    } catch (error) {
-      console.error('Error sending bookings to provider:', error);
-      alert('Error sending bookings. Please try again.');
-    }
-  };
-
-  const handleViewProviderCommunication = (providerId) => {
-    const provider = clinics.find(c => c.id === providerId);
-    const providerBookings = bookings.filter(b => b.clinic_id === providerId);
-    
-    alert(`Communication Overview for ${provider?.name}:\n\n` +
-          `Total Bookings: ${providerBookings.length}\n` +
-          `Pending: ${providerBookings.filter(b => b.status === 'pending').length}\n` +
-          `In Progress: ${providerBookings.filter(b => ['confirmed', 'sample_collected'].includes(b.status)).length}\n` +
-          `Completed: ${providerBookings.filter(b => b.status === 'completed').length}\n\n` +
-          `Communication Status: Active\n` +
-          `Login Email: ${provider?.email}\n\n` +
-          `The provider can access their portal at: /clinic-dashboard`);
-  };
-
-  const handleToggleProviderAccess = async (providerId, currentStatus) => {
-    try {
-      const newStatus = currentStatus !== false ? false : true;
-      const action = newStatus ? 'restored' : 'suspended';
-      
-      await axios.put(`${API}/users/${providerId}`, { 
-        is_active: newStatus,
-        updated_at: new Date().toISOString()
-      });
-      
-      fetchClinics();
-      alert(`Provider access has been ${action} successfully.`);
-      
-    } catch (error) {
-      console.error('Error toggling provider access:', error);
-      alert('Error updating provider access. Please try again.');
-    }
-  };
-
   const handleResetProviderPassword = async (providerId, email) => {
     if (window.confirm(`Are you sure you want to reset the password for ${email}?`)) {
       try {
