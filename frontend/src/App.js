@@ -5726,7 +5726,9 @@ const CartBookingForm = ({ cartItems, currency, total, onClose, onSuccess }) => 
     patient_phone: '',
     patient_location: '',
     delivery_method: 'whatsapp',
-    delivery_charge: 0
+    delivery_charge: 0,
+    preferred_date: '',
+    preferred_time: ''
   });
   const [loading, setLoading] = useState(false);
 
