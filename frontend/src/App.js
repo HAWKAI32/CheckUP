@@ -5748,7 +5748,9 @@ const CartBookingForm = ({ cartItems, currency, total, onClose, onSuccess }) => 
           preferred_currency: currency.toUpperCase(),
           total_amount: currency === 'USD' ? item.pricing.price_usd : item.pricing.price_lrd,
           delivery_method: formData.delivery_method,
-          notes: `Booked via cart - Test: ${item.test.name}, Provider: ${item.provider.name}`
+          preferred_date: formData.preferred_date,
+          preferred_time: formData.preferred_time,
+          notes: `Booked via cart - Test: ${item.test.name}, Provider: ${item.provider.name} | Preferred Date: ${formData.preferred_date} | Preferred Time: ${formData.preferred_time}`
         };
 
         return axios.post(`${API}/bookings`, bookingData);
