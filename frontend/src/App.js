@@ -5236,6 +5236,13 @@ const TestProviders = () => {
     if (existingItemIndex === -1) {
       existingCart.push(cartItem);
       localStorage.setItem('chekup_cart', JSON.stringify(existingCart));
+      
+      // Dispatch custom event to notify CartSummary of cart changes
+      const cartUpdateEvent = new CustomEvent('cartUpdated', { 
+        detail: { cart: existingCart } 
+      });
+      window.dispatchEvent(cartUpdateEvent);
+      
       alert('Test added to cart successfully!');
     } else {
       alert('This test is already in your cart!');
