@@ -3458,7 +3458,25 @@ const SurgeryInquiry = () => {
     setLoading(true);
 
     try {
-      await axios.post(`${API}/surgery-inquiries`, formData);
+      let submitData = { ...formData };
+      
+      // Handle file upload if present
+      if (formData.medical_report) {
+        const reader = new FileReader();
+        const fileData = await new Promise((resolve) => {
+          reader.onload = (e) => resolve(e.target.result);
+          reader.readAsDataURL(formData.medical_report);
+        });
+        
+        submitData.medical_report = {
+          name: formData.medical_report.name,
+          type: formData.medical_report.type,
+          size: formData.medical_report.size,
+          data: fileData
+        };
+      }
+
+      await axios.post(`${API}/surgery-inquiries`, submitData);
       alert('Surgery inquiry submitted successfully! Our team will contact you within 24 hours.');
       navigate('/');
     } catch (error) {
