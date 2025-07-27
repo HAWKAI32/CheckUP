@@ -3597,6 +3597,63 @@ const SurgeryInquiry = () => {
               />
             </div>
 
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Medical Report (Optional)
+              </label>
+              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                <div className="space-y-1 text-center">
+                  <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                  <div className="flex text-sm text-gray-600">
+                    <label htmlFor="medical-report" className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                      <span>Upload a file</span>
+                      <input 
+                        id="medical-report" 
+                        name="medical-report" 
+                        type="file" 
+                        className="sr-only"
+                        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (file) {
+                            // Check file size (max 10MB)
+                            if (file.size > 10 * 1024 * 1024) {
+                              alert('File size should not exceed 10MB');
+                              return;
+                            }
+                            setFormData({...formData, medical_report: file});
+                          }
+                        }}
+                      />
+                    </label>
+                    <p className="pl-1">or drag and drop</p>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    PDF, JPG, PNG, DOC up to 10MB
+                  </p>
+                  {formData.medical_report && (
+                    <div className="mt-2 p-2 bg-green-50 rounded border border-green-200">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-green-700 truncate">
+                          {formData.medical_report.name}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setFormData({...formData, medical_report: null})}
+                          className="text-red-600 hover:text-red-800 ml-2"
+                        >
+                          <XCircle className="h-4 w-4" />
+                        </button>
+                      </div>
+                      <p className="text-xs text-green-600">
+                        {(formData.medical_report.size / 1024 / 1024).toFixed(2)} MB
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
             <div className="flex space-x-4">
               <button
                 type="button"
